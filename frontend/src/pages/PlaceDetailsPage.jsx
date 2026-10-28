@@ -20,15 +20,20 @@ import {
 import { MOCK_DESTINATIONS, MOCK_EXPERIENCES } from '../data/mockData';
 import ExperienceCard from '../components/ExperienceCard';
 import ExperienceDetailModal from '../components/ExperienceDetailModal';
+import RouteMap from '../components/RouteMap';
 
 export default function PlaceDetailsPage({
   favorites,
   onToggleFavorite,
   tripItems,
   onToggleTrip,
-  onNavigateToExperiences
+  onNavigateToExperiences,
+  selectedDestinationId: controlledDestId,
+  onSelectDestination
 }) {
-  const [selectedDestinationId, setSelectedDestinationId] = useState('orchha-heritage');
+  const [internalDestId, setInternalDestId] = useState('amber-fort');
+  const selectedDestinationId = controlledDestId || internalDestId;
+  const setSelectedDestinationId = onSelectDestination || setInternalDestId;
   const [activeModalExperience, setActiveModalExperience] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
 
@@ -83,11 +88,11 @@ export default function PlaceDetailsPage({
                   onClick={() => setSelectedDestinationId(dest.id)}
                   className={`px-3 py-1 text-xs font-semibold rounded-full transition-all duration-200 active:scale-95 ${
                     selectedDestinationId === dest.id
-                      ? "bg-primary text-white shadow-sm"
+                      ? "bg-primary text-white shadow-sm font-bold"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  {dest.name.split(' ')[0]}
+                  {dest.state || dest.name.split(' ')[0]}
                 </button>
               ))}
             </div>
@@ -323,66 +328,8 @@ export default function PlaceDetailsPage({
               </div>
             </div>
 
-            {/* Map / Location Preview Card */}
-            <div className="bg-card rounded-xl overflow-hidden border border-border-subtle shadow-level-1">
-              <div className="p-4 border-b border-border-subtle bg-slate-50 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Navigation className="w-4 h-4 text-primary" />
-                  <h3 className="font-display font-bold text-sm text-slate-900">
-                    Location & Geography
-                  </h3>
-                </div>
-                <span className="text-[11px] font-semibold text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full">
-                  GPS Ready
-                </span>
-              </div>
-
-              {/* Visual Map Mock Box */}
-              <div className="relative h-48 bg-gradient-to-br from-slate-100 via-emerald-50 to-orange-50 p-4 flex flex-col justify-between overflow-hidden">
-                {/* Visual grid / contour lines */}
-                <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#0F766E_1px,transparent_1px)] [background-size:16px_16px]" />
-
-                {/* Map Pin Marker */}
-                <div className="relative z-10 flex items-center gap-2 bg-white/95 backdrop-blur-md p-2.5 rounded-lg shadow-level-2 border border-slate-200 self-start max-w-xs">
-                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white shrink-0 animate-bounce">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h5 className="font-display font-bold text-xs text-slate-900 truncate">
-                      {destination.name}
-                    </h5>
-                    <p className="text-[10px] text-slate-500">
-                      {destination.mapCoordinates.lat}° N, {destination.mapCoordinates.lng}° E
-                    </p>
-                  </div>
-                </div>
-
-                {/* Coordinates & Elevation Info */}
-                <div className="relative z-10 bg-slate-900/80 backdrop-blur-md rounded-md p-2 text-white text-[11px] flex items-center justify-between">
-                  <span>Alt: {destination.mapCoordinates.elevation}</span>
-                  <span className="text-primary-tint font-mono">
-                    {destination.mapCoordinates.lat.toFixed(2)}, {destination.mapCoordinates.lng.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Transit detail */}
-              <div className="p-4 bg-white text-xs text-slate-600 border-t border-border-subtle space-y-2">
-                <div className="flex items-start gap-2">
-                  <span className="font-semibold text-slate-800">Nearest Transit:</span>
-                  <span>{destination.mapCoordinates.nearestTransit}</span>
-                </div>
-                <a
-                  href={`https://maps.google.com/?q=${destination.mapCoordinates.lat},${destination.mapCoordinates.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-primary font-semibold hover:underline pt-1"
-                >
-                  <span>Open in External Navigation Map</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
+            {/* Embedded Interactive Route Map & Directions Section */}
+            <RouteMap destination={destination} />
           </div>
         </div>
 
