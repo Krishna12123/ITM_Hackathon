@@ -264,7 +264,7 @@ export default function ContributionFormPage({ onCancel, onShowToast }) {
           </h2>
 
           <p className="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed mb-6">
-            Your suggested contribution for <span className="font-bold text-slate-900">"{submittedData.title}"</span> has been captured. In the live platform, community elders and local tourism verifiers review submitted gems before publishing them to the YatraSaathi AI knowledgebase.
+            Your suggested contribution for <span className="font-bold text-slate-900">"{submittedData.title}"</span> has been captured. In the live platform, community elders and local tourism verifiers review submitted gems before publishing them to the SSM AI knowledgebase.
           </p>
 
           {/* Submission Summary Card */}

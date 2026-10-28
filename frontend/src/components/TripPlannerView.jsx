@@ -497,7 +497,7 @@ All Spiritual Traditions / Secular                    </button>
                 </div>
                 {/* Topographic & Itinerary Feature Highlights */}
                 <div className="space-y-3">
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">YatraSathi Engine Inclusions</span>
+                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">SSM Engine Inclusions</span>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3 font-body-sm text-body-sm">
                       <div className="w-6 h-6 rounded-md bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0 mt-0.5">

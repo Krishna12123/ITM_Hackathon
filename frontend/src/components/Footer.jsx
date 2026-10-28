@@ -10,7 +10,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary">
                 <span className="material-symbols-outlined text-[18px]">terrain</span>
               </div>
-              <span className="font-headline-sm text-headline-sm text-primary font-bold">YatraSathi</span>
+              <span className="font-headline-sm text-headline-sm text-primary font-bold">SSM</span>
             </div>
             <p className="font-body-sm text-body-sm text-on-surface-variant">
               Intelligent expedition architecture, route mapping, and budgetary analysis for global explorers.
@@ -45,7 +45,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-on-surface-variant border-t border-surface-container-high/40">
-          <p>© 2025 YatraSathi Technologies. All rights reserved.</p>
+          <p>© 2025 SSM Technologies. All rights reserved.</p>
           <div className="flex items-center gap-6 font-label-md text-label-md">
             <a className="hover:text-on-surface transition-colors" href="#">Privacy</a>
             <a className="hover:text-on-surface transition-colors" href="#">Security</a>

@@ -112,7 +112,7 @@ export default function Navbar({
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="font-display font-extrabold text-lg sm:text-xl text-[#172033] tracking-tight">
-                  Yatra<span className="text-[#F45B0B]">Saathi</span>
+                  SS<span className="text-[#F45B0B]">M</span>
                 </span>
                 <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#F45B0B]/10 text-[#F45B0B] border border-[#F45B0B]/20 hidden xs:inline-block">
                   India
@@ -274,7 +274,7 @@ export default function Navbar({
 
                   <div className="pt-3 border-t border-[#E5E7EB] mt-3 text-center">
                     <span className="text-[10px] text-[#64748B]">
-                      Verified by YatraSaathi Tourism Council
+                      Verified by SSM Tourism Council
                     </span>
                   </div>
                 </div>
@@ -338,7 +338,7 @@ export default function Navbar({
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-[#F45B0B]" />
                 <span className="text-xs font-bold text-[#172033]">
-                  YatraSaathi Explorer
+                  SSM Explorer
                 </span>
               </div>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#F45B0B] border border-[#FED7AA]">
