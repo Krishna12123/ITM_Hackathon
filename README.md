@@ -1,4 +1,4 @@
-# TerraVenture - AI Trip Planner & Smart Itinerary
+# YatraSathi - AI Trip Planner & Smart Itinerary
 
 A modern travel intelligence platform based on the **Google Stitch** TerraVenture trip planner module designs (`/Users/krishnashukla/Desktop/stitch_terraventure_trip_planner_module`).
 
