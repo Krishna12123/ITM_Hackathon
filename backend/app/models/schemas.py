@@ -18,11 +18,61 @@ class PredictionResponse(BaseModel):
 
 class ItineraryRequest(BaseModel):
     destination: str = Field(default="Udaipur, Rajasthan")
-    days: int = Field(default=4, ge=1, le=14)
+    start_date: Optional[str] = Field(default="Oct 14")
+    end_date: Optional[str] = Field(default="Oct 18")
+    days: int = Field(default=4, ge=1, le=30)
+    nights: Optional[int] = Field(default=3, ge=0)
     guests: int = Field(default=2, ge=1)
+    spend_per_person: Optional[float] = Field(default=18500.0)
     budget: float = Field(default=18500.0)
-    vibe: Optional[str] = Field(default="Heritage & Architecture")
+    total_budget: Optional[float] = Field(default=37000.0)
+    budget_tier: Optional[str] = Field(default="Comfortable Boutique")
+    budget_breakdown: Optional[Dict[str, float]] = None
+    interests: List[str] = Field(default_factory=lambda: ["Heritage & Forts", "Nature & Lakes"])
+    spiritual_traditions: Optional[List[str]] = Field(default_factory=list)
     pacing: Optional[str] = Field(default="Balanced")
+    transit_mode: Optional[str] = Field(default="local_taxi")
+    vibe: Optional[str] = Field(default="Heritage & Architecture")
+
+class TripInputCreate(BaseModel):
+    destination: str = Field(default="Udaipur, Rajasthan")
+    start_date: Optional[str] = "Oct 14"
+    end_date: Optional[str] = "Oct 18"
+    days: int = Field(default=4, ge=1)
+    nights: Optional[int] = 3
+    guests: int = Field(default=2, ge=1)
+    spend_per_person: float = 18500.0
+    total_budget: float = 37000.0
+    budget_tier: str = "Comfortable Boutique"
+    budget_breakdown: Optional[Dict[str, float]] = Field(
+        default_factory=lambda: {
+            "stay_pct": 42.0,
+            "experiences_pct": 34.0,
+            "dining_transit_pct": 24.0
+        }
+    )
+    interests: List[str] = Field(
+        default_factory=lambda: [
+            "Heritage & Forts",
+            "Culinary Trails",
+            "Nature & Lakes"
+        ]
+    )
+    spiritual_traditions: Optional[List[str]] = Field(
+        default_factory=lambda: [
+            "Hindu & Vedic Temples"
+        ]
+    )
+    pacing: str = Field(default="Balanced")
+    transit_mode: str = Field(default="local_taxi")
+    raw_text: Optional[str] = None
+
+class TripInputResponse(BaseModel):
+    id: Optional[str] = None
+    status: str
+    message: str
+    data: Optional[Dict[str, Any]] = None
+    supabase_synced: bool = False
 
 class ItineraryResponse(BaseModel):
     destination: str
@@ -31,3 +81,29 @@ class ItineraryResponse(BaseModel):
     total_budget: float
     budget_breakdown: Dict[str, float]
     status: str = "success"
+
+
+class PaymentCheckoutRequest(BaseModel):
+    amount: float = Field(..., gt=0, description="Amount in INR to be charged")
+    trip_destination: str = Field(..., description="Destination associated with the trip")
+    customer_email: Optional[str] = Field(None, description="Contact email for checkout session")
+    customer_name: Optional[str] = Field(None, description="Customer name")
+    success_url: Optional[str] = None
+    cancel_url: Optional[str] = None
+
+class PaymentCheckoutResponse(BaseModel):
+    session_id: str
+    order_id: str
+    checkout_url: str
+    amount: float
+    currency: str
+    status: str
+
+class PaymentVerifyRequest(BaseModel):
+    session_id: str
+
+class PaymentVerifyResponse(BaseModel):
+    success: bool
+    session_id: str
+    status: str
+    transaction: Optional[Dict[str, Any]] = None
