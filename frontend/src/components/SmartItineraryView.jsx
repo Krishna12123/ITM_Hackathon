@@ -303,7 +303,10 @@ export default function SmartItineraryView({ onNavigate }) {
   }, [tripId]);
 
   const destinationName = activePlan?.destination || 'Udaipur, Rajasthan, India';
-  const durationDays = activePlan?.duration_days || activePlan?.days || 4;
+  const durationDays = activePlan?.duration_days || activePlan?.days || activePlan?.itinerary_days?.length || 4;
+  const nightsCount = activePlan?.nights || activePlan?.budget_ledger?.nights || Math.max(1, durationDays - 1);
+  const startDateStr = activePlan?.start_date || 'Oct 14';
+  const endDateStr = activePlan?.end_date || 'Oct 18';
   const travelersCount = activePlan?.travelers || activePlan?.guests || 2;
   const paceName = activePlan?.travel_pace || activePlan?.selected_pace || 'Balanced';
   const transitName = activePlan?.transit_mode || activePlan?.selected_transit || 'Auto / Walk';
@@ -321,7 +324,8 @@ export default function SmartItineraryView({ onNavigate }) {
     ? activePlan.itinerary_days
     : DEFAULT_DAYS;
 
-  const currentDay = activeDays[selectedDayIndex] || activeDays[0] || {};
+  const safeDayIndex = Math.min(selectedDayIndex, Math.max(0, activeDays.length - 1));
+  const currentDay = activeDays[safeDayIndex] || activeDays[0] || {};
   const morning = currentDay.morning_sequence;
   const afternoon = currentDay.afternoon_immersion;
   const evening = currentDay.evening_finale;
@@ -357,8 +361,9 @@ export default function SmartItineraryView({ onNavigate }) {
                 <h1 className="font-headline-xl text-headline-xl text-clinical-navy tracking-tight">{destinationName}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-on-surface-variant font-body-sm text-body-sm">
                   <div className="flex items-center gap-1.5 font-medium">
-                    <span className="material-symbols-outlined text-[18px] text-outline">calendar_month</span>
-                    <span>{durationDays} Days Expedited</span>
+                    <span className="material-symbols-outlined text-[18px] text-primary">calendar_month</span>
+                    <span className="text-clinical-navy font-semibold">{durationDays} Days, {nightsCount} Nights</span>
+                    <span className="text-outline text-xs">({startDateStr} – {endDateStr})</span>
                   </div>
                   <div className="w-1 h-1 rounded-full bg-outline-variant"></div>
                   <div className="flex items-center gap-1.5 font-medium">

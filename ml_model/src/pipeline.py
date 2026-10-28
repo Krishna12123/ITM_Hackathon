@@ -88,28 +88,40 @@ class ItineraryMLPipeline:
                 "Coastal Fortresses, Old Goa Cathedrals & Latin Quarter",
                 "Spice Plantations, Jungle Cascades & Heritage Sanctums",
                 "Artisan Beach Markets, Sunsets & Bohemian Vibes",
-                "Cliff Bastions, Dolphin Coves & Mandovi Twilight Cruise"
+                "Cliff Bastions, Dolphin Coves & Mandovi Twilight Cruise",
+                "Mangrove Estuaries, Bird Sanctuaries & Divar Island Trails",
+                "Sweetwater Lagoons, Sunset Cliffs & Drum Circles",
+                "Konkan Heritage Ethnography & Deepstambha Temples"
             ]
         elif "jaipur" in dest_lower:
             day_themes = [
                 "Pink City Palaces & UNESCO Heritage Forts",
                 "Astronomy Observatories & Stepwells",
                 "Artisan Bazaars & Traditional Puppetry",
-                "Hilltop Nahargarh Sunset & Farewell Feast"
+                "Hilltop Nahargarh Sunset & Farewell Feast",
+                "Ancient Amer Stepwells & Hand-Block Printing Guilds",
+                "Royal Cenotaphs & Traditional Rajasthani Haveli Walks",
+                "Jaigarh Ramparts & Panoramic Aravali Trails"
             ]
         elif "varanasi" in dest_lower:
             day_themes = [
                 "Sacred Ghats, Morning Aarti & Kashi Sanctum",
                 "Sarnath Buddhist Stupas & Silk Weavers",
                 "Spiritual Alleyways & Evening Ganga Aarti",
-                "Historic Forts & Waterfront Farewell"
+                "Historic Forts & Waterfront Farewell",
+                "Ramnagar Fort & Riverine Sunrise Boat Journey",
+                "Generational Music Gurukuls & Classical Sitar Walks",
+                "Sacred Kunds & Ancient Temple Corridors"
             ]
         else:
             day_themes = [
                 "Old City Heritage Sanctum & Lake Sunset",
                 "Royal Palaces, Hilltop Monsoons & Nature Trails",
                 "Artisan Guilds, Miniature Painting & Cultural Immersion",
-                "Sacred Temples, Scenic Waterfronts & Farewell Feast"
+                "Sacred Temples, Scenic Waterfronts & Farewell Feast",
+                "Fateh Sagar Boating & Bahubali Hill Lookouts",
+                "Shilpgram Folk Village & Generational Crafts",
+                "10th-Century Torana Temples & Illuminated Lakeside Plazas"
             ]
 
         final_days = []

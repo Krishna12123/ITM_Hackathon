@@ -638,5 +638,315 @@
       "hindu_temples"
     ],
     "image_url": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "udaipur-fateh-sagar",
+    "place_name": "Fateh Sagar Lake & Nehru Island Park",
+    "destination": "Udaipur, Rajasthan",
+    "category": "Nature & Water",
+    "description": "Scenic pear-shaped artificial lake built in 1687 with three islands, mountain backdrops, and boating to Nehru Park island garden.",
+    "latitude": 24.6042,
+    "longitude": 73.6738,
+    "rating": 4.7,
+    "entry_fee": 0,
+    "opening_hours": "06:00 - 20:00",
+    "open_hour": 6.0,
+    "close_hour": 20.0,
+    "suggested_duration_minutes": 75,
+    "best_visit_time": "Morning",
+    "tags": [
+      "nature",
+      "lakes",
+      "scenic",
+      "kayaking"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "udaipur-bahubali-hills",
+    "place_name": "Bahubali Hills & Badi Lake Lookout",
+    "destination": "Udaipur, Rajasthan",
+    "category": "Nature & Scenic Lookout",
+    "description": "Elevated panoramic cliff trail overlooking the tranquil green waters of Lake Badi and surrounding Aravali hill ranges.",
+    "latitude": 24.6293,
+    "longitude": 73.6358,
+    "rating": 4.8,
+    "entry_fee": 30,
+    "opening_hours": "06:00 - 18:30",
+    "open_hour": 6.0,
+    "close_hour": 18.5,
+    "suggested_duration_minutes": 90,
+    "best_visit_time": "Morning",
+    "tags": [
+      "nature",
+      "scenic",
+      "hiking",
+      "viewpoint"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "udaipur-shilpgram",
+    "place_name": "Shilpgram Rural Arts & Crafts Complex",
+    "destination": "Udaipur, Rajasthan",
+    "category": "Art & Folk Workshops",
+    "description": "Living ethnographic museum spanning 70 acres depicting rural lifestyle, folk pottery, textile weaving, and traditional tribal performances.",
+    "latitude": 24.6186,
+    "longitude": 73.6669,
+    "rating": 4.6,
+    "entry_fee": 50,
+    "opening_hours": "11:00 - 19:00",
+    "open_hour": 11.0,
+    "close_hour": 19.0,
+    "suggested_duration_minutes": 120,
+    "best_visit_time": "Afternoon",
+    "tags": [
+      "art",
+      "folk_performances",
+      "workshops",
+      "heritage"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "udaipur-karni-mata",
+    "place_name": "Mansapurna Karni Mata Ropeway & Viewpoint",
+    "destination": "Udaipur, Rajasthan",
+    "category": "Spiritual Sanctum & Viewpoint",
+    "description": "Cable car ride ascending Machhla Magra hill leading to the sacred Karni Mata temple with illuminated dusk vistas over City Palace and lakes.",
+    "latitude": 24.5714,
+    "longitude": 73.6896,
+    "rating": 4.6,
+    "entry_fee": 120,
+    "opening_hours": "09:00 - 21:00",
+    "open_hour": 9.0,
+    "close_hour": 21.0,
+    "suggested_duration_minutes": 60,
+    "best_visit_time": "Evening",
+    "tags": [
+      "spiritual",
+      "viewpoint",
+      "sunset",
+      "temple"
+    ],
+    "spiritual_preferences": [
+      "hindu_temples"
+    ],
+    "spiritual_tags": [
+      "hindu_temples"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "udaipur-sas-bahu",
+    "place_name": "Sahastra Bahu 10th-Century Temple Complex, Nagda",
+    "destination": "Udaipur, Rajasthan",
+    "category": "Ancient Heritage & Sanctum",
+    "description": "Magnificent 10th-century sandstones temples dedicated to Lord Vishnu, featuring exquisite torana archways, lotus ceiling carvings, and epic friezes.",
+    "latitude": 24.7175,
+    "longitude": 73.7225,
+    "rating": 4.7,
+    "entry_fee": 25,
+    "opening_hours": "08:00 - 17:00",
+    "open_hour": 8.0,
+    "close_hour": 17.0,
+    "suggested_duration_minutes": 75,
+    "best_visit_time": "Morning",
+    "tags": [
+      "heritage",
+      "architecture",
+      "spiritual",
+      "history"
+    ],
+    "spiritual_preferences": [
+      "hindu_temples",
+      "sacred_architecture"
+    ],
+    "spiritual_tags": [
+      "hindu_temples",
+      "sacred_architecture"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "udaipur-sukhadia-circle",
+    "place_name": "Sukhadia Circle Illuminated Fountain & Street Food",
+    "destination": "Udaipur, Rajasthan",
+    "category": "Culinary & Evening Stroll",
+    "description": "Vibrant civic plaza with a monumental three-tiered marble fountain surrounded by paddle boating and legendary local Pav Bhaji and Kulfi stalls.",
+    "latitude": 24.6028,
+    "longitude": 73.6898,
+    "rating": 4.5,
+    "entry_fee": 0,
+    "opening_hours": "17:00 - 22:30",
+    "open_hour": 17.0,
+    "close_hour": 22.5,
+    "suggested_duration_minutes": 60,
+    "best_visit_time": "Evening",
+    "tags": [
+      "culinary",
+      "evening",
+      "food",
+      "street_food"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "goa-reis-magos-fort",
+    "place_name": "Reis Magos Fort & Cultural Centre",
+    "destination": "Goa, India",
+    "category": "Heritage & Forts",
+    "description": "Restored 1551 CE Portuguese river fortress standing sentinel over the Mandovi River mouth, housing cultural exhibitions and antique cannons.",
+    "latitude": 15.4981,
+    "longitude": 73.8094,
+    "rating": 4.6,
+    "entry_fee": 50,
+    "opening_hours": "09:30 - 17:30",
+    "open_hour": 9.5,
+    "close_hour": 17.5,
+    "suggested_duration_minutes": 75,
+    "best_visit_time": "Morning",
+    "tags": [
+      "heritage",
+      "fort",
+      "architecture",
+      "coastal",
+      "history"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "goa-divar-island",
+    "place_name": "Divar Island Heritage Village & Cycling Trail",
+    "destination": "Goa, India",
+    "category": "Heritage & Nature Trail",
+    "description": "Serene riverine island accessed by vintage car ferry, featuring old-world Indo-Portuguese manor homes, paddy fields, and hilltop chapel vistas.",
+    "latitude": 15.516,
+    "longitude": 73.9142,
+    "rating": 4.7,
+    "entry_fee": 0,
+    "opening_hours": "07:00 - 19:00",
+    "open_hour": 7.0,
+    "close_hour": 19.0,
+    "suggested_duration_minutes": 120,
+    "best_visit_time": "Morning",
+    "tags": [
+      "heritage",
+      "nature",
+      "scenic",
+      "cycling",
+      "village"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "goa-shanta-durga",
+    "place_name": "Shri Shantadurga Temple Complex, Kavlem",
+    "destination": "Goa, India",
+    "category": "Spiritual Sanctum & Architecture",
+    "description": "Historic 18th-century Goan Hindu temple dedicated to the goddess of peace, featuring a striking pyramidal shikhara and seven-storey octagonal Deepstambha lamp tower.",
+    "latitude": 15.3956,
+    "longitude": 73.9928,
+    "rating": 4.8,
+    "entry_fee": 0,
+    "opening_hours": "06:00 - 20:30",
+    "open_hour": 6.0,
+    "close_hour": 20.5,
+    "suggested_duration_minutes": 60,
+    "best_visit_time": "Morning",
+    "tags": [
+      "spiritual",
+      "temple",
+      "heritage",
+      "architecture"
+    ],
+    "spiritual_preferences": [
+      "hindu_temples"
+    ],
+    "spiritual_tags": [
+      "hindu_temples"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "goa-salim-ali-bird",
+    "place_name": "Dr. Salim Ali Bird Sanctuary Mangroves",
+    "destination": "Goa, India",
+    "category": "Nature & Wildlife",
+    "description": "Estuarine mangrove forest sanctuary on Chorao Island along Mandovi River, accessible via canopy boardwalks and canoe safari among migratory egrets and kingfishers.",
+    "latitude": 15.5097,
+    "longitude": 73.8703,
+    "rating": 4.5,
+    "entry_fee": 20,
+    "opening_hours": "06:00 - 18:00",
+    "open_hour": 6.0,
+    "close_hour": 18.0,
+    "suggested_duration_minutes": 90,
+    "best_visit_time": "Morning",
+    "tags": [
+      "nature",
+      "wildlife",
+      "kayaking",
+      "mangrove",
+      "birds"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "goa-arambol-sunset",
+    "place_name": "Arambol Sweetwater Lagoon & Cliff Trail",
+    "destination": "Goa, India",
+    "category": "Nature & Bohemian Sunsets",
+    "description": "Pristine freshwater lagoon nestled behind sea cliffs, famous for beach drum circles, sunset gatherings, and natural banyan tree trails.",
+    "latitude": 15.6882,
+    "longitude": 73.7032,
+    "rating": 4.7,
+    "entry_fee": 0,
+    "opening_hours": "06:00 - 21:00",
+    "open_hour": 6.0,
+    "close_hour": 21.0,
+    "suggested_duration_minutes": 90,
+    "best_visit_time": "Evening",
+    "tags": [
+      "nature",
+      "beach",
+      "sunset",
+      "scenic",
+      "evening"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "goa-chitra-museum",
+    "place_name": "Goa Chitra Ethnographic Museum, Benaulim",
+    "destination": "Goa, India",
+    "category": "Art & Generational Heritage",
+    "description": "Acclaimed heritage museum curated by master restorer Victor Hugo Gomes, housing 4,000+ indigenous agricultural implements, antique carriages, and traditional Konkan crafts.",
+    "latitude": 15.2678,
+    "longitude": 73.9678,
+    "rating": 4.8,
+    "entry_fee": 300,
+    "opening_hours": "09:00 - 18:00",
+    "open_hour": 9.0,
+    "close_hour": 18.0,
+    "suggested_duration_minutes": 100,
+    "best_visit_time": "Afternoon",
+    "tags": [
+      "art",
+      "heritage",
+      "workshops",
+      "culture",
+      "museum"
+    ],
+    "spiritual_tags": [],
+    "image_url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80"
   }
 ]

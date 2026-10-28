@@ -68,6 +68,13 @@ def generate_itinerary(request: ItineraryRequest):
 
     total = request.total_budget if request.total_budget else (request.spend_per_person * request.guests if request.spend_per_person else request.budget)
 
+    alloc_map = {"stay": 42.0, "experiences": 34.0, "dining_transit": 24.0}
+    if request.budget_breakdown:
+        s = request.budget_breakdown.get("stay", request.budget_breakdown.get("stay_pct", 42.0))
+        e = request.budget_breakdown.get("experiences", request.budget_breakdown.get("experiences_pct", 34.0))
+        d = request.budget_breakdown.get("dining_transit", request.budget_breakdown.get("dining_transit_pct", 24.0))
+        alloc_map = {"stay": float(s), "experiences": float(e), "dining_transit": float(d)}
+
     # 2. Map input fields to ML system
     ml_input = {
         "destination": request.destination,
@@ -77,7 +84,7 @@ def generate_itinerary(request: ItineraryRequest):
         "travelers": request.guests,
         "budget_per_person": request.spend_per_person or (total / request.guests),
         "budget_category": request.budget_tier or "comfortable_boutique",
-        "budget_allocation": request.budget_breakdown or {"stay": 42, "experiences": 34, "dining_transit": 24},
+        "budget_allocation": alloc_map,
         "interests": request.interests,
         "spiritual_preferences": request.spiritual_traditions or [],
         "travel_pace": request.pacing or "balanced",

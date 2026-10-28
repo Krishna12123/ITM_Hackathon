@@ -32,6 +32,78 @@ export default function TripPlannerView({ onNavigate }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
+  // Dynamic Date & Duration State
+  const [startDate, setStartDate] = useState('2026-10-14');
+  const [durationDays, setDurationDays] = useState(4);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+
+  // Helper to calculate end date based on start date and number of days
+  const calculateEndDate = (start, days) => {
+    try {
+      const d = new Date(start);
+      if (isNaN(d.getTime())) return '2026-10-17';
+      d.setDate(d.getDate() + (days - 1));
+      return d.toISOString().split('T')[0];
+    } catch (e) {
+      return start;
+    }
+  };
+
+  const endDate = calculateEndDate(startDate, durationDays);
+  const nights = Math.max(1, durationDays - 1);
+
+  const formatDateDisplay = (startStr, endStr) => {
+    try {
+      const s = new Date(startStr);
+      const e = new Date(endStr);
+      if (isNaN(s.getTime()) || isNaN(e.getTime())) {
+        return 'Oct 14 – Oct 17, 2026';
+      }
+      const sMonth = s.toLocaleString('en-US', { month: 'short' });
+      const eMonth = e.toLocaleString('en-US', { month: 'short' });
+      const sDay = s.getDate();
+      const eDay = e.getDate();
+      if (sMonth === eMonth) {
+        return `${sMonth} ${sDay} – ${eDay}, ${s.getFullYear()}`;
+      }
+      return `${sMonth} ${sDay} – ${eMonth} ${eDay}, ${s.getFullYear()}`;
+    } catch (err) {
+      return `${startStr} – ${endStr}`;
+    }
+  };
+
+  const handleStartDateChange = (newStart) => {
+    setStartDate(newStart);
+  };
+
+  const handleEndDateChange = (newEnd) => {
+    try {
+      const s = new Date(startDate);
+      const e = new Date(newEnd);
+      const diffMs = e - s;
+      if (diffMs >= 0) {
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
+        setDurationDays(Math.min(7, Math.max(1, diffDays)));
+      }
+    } catch (err) {}
+  };
+
+  const handleDurationSelect = (daysCount) => {
+    setDurationDays(daysCount);
+  };
+
+  const handleIncrementDays = () => {
+    if (durationDays < 7) {
+      setDurationDays(prev => prev + 1);
+    }
+  };
+
+  const handleDecrementDays = () => {
+    if (durationDays > 1) {
+      setDurationDays(prev => prev - 1);
+    }
+  };
+
   const getBudgetTier = (val) => {
     if (val < 10000) return { label: 'Backpacker Smart', bg: 'bg-surface-container-high text-on-surface' };
     if (val < 32000) return { label: 'Comfortable Boutique', bg: 'bg-secondary text-on-secondary' };
@@ -75,14 +147,14 @@ export default function TripPlannerView({ onNavigate }) {
   const onGenerate = async () => {
     const finalDest = destination.trim() || 'Goa, India';
     setIsGenerating(true);
-    setStatusMessage('Synthesizing AI Itinerary & Syncing with Supabase...');
+    setStatusMessage(`Synthesizing ${durationDays}-Day AI Itinerary & Syncing with Supabase...`);
 
     const tripPayload = {
       destination: finalDest,
-      start_date: 'Oct 14',
-      end_date: 'Oct 18',
-      days: 4,
-      nights: 3,
+      start_date: startDate,
+      end_date: endDate,
+      days: durationDays,
+      nights: nights,
       guests: guestCount,
       spend_per_person: budget,
       total_budget: budget * guestCount,
@@ -220,20 +292,116 @@ export default function TripPlannerView({ onNavigate }) {
 
                 {/* Field 2: Dates & Travelers Split Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Date Range Picker */}
+                  {/* Interactive Date Range & Duration Picker */}
                   <div className="flex flex-col gap-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant">Dates & Duration</label>
-                    <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors border border-border-subtle">
+                    <div className="flex items-center justify-between">
+                      <label className="font-label-md text-label-md text-on-surface-variant">Dates & Duration</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                        className="text-[12px] font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">edit_calendar</span>
+                        <span>{isDatePickerOpen ? 'Hide Inputs' : 'Select Dates'}</span>
+                      </button>
+                    </div>
+
+                    {/* Summary Pill Card (Clickable to toggle inputs) */}
+                    <div
+                      onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                      className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-all border border-border-subtle"
+                    >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span className="material-symbols-outlined text-[20px] text-primary">calendar_month</span>
                         <div className="flex flex-col truncate">
-                          <span className="font-label-lg text-label-lg text-on-surface truncate">Oct 14 - Oct 18</span>
-                          <span className="font-label-sm text-label-sm text-on-surface-variant">4 Days, 3 Nights</span>
+                          <span className="font-label-lg text-label-lg text-on-surface font-semibold truncate">
+                            {formatDateDisplay(startDate, endDate)}
+                          </span>
+                          <span className="font-label-sm text-label-sm text-primary font-bold">
+                            {durationDays} {durationDays === 1 ? 'Day' : 'Days'}, {nights} {nights === 1 ? 'Night' : 'Nights'} Plan
+                          </span>
                         </div>
                       </div>
-                      <span className="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+                      <span className={`material-symbols-outlined text-[18px] text-outline transition-transform duration-200 ${isDatePickerOpen ? 'rotate-180' : ''}`}>
+                        expand_more
+                      </span>
                     </div>
+
+                    {/* Interactive Duration Quick-Chips (Always accessible) */}
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                      <span className="font-label-sm text-label-sm text-on-surface-variant mr-1">Plan:</span>
+                      {[2, 3, 4, 5, 6, 7].map((num) => {
+                        const isSelected = durationDays === num;
+                        return (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => handleDurationSelect(num)}
+                            className={`px-2.5 py-0.5 rounded-full font-label-sm text-label-sm transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-primary text-on-primary font-bold shadow-sm'
+                                : 'bg-surface-container-low hover:bg-surface-container text-on-surface-variant'
+                            }`}
+                          >
+                            {num} Days
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Expandable Calendar Inputs & Custom Day Stepper */}
+                    {isDatePickerOpen && (
+                      <div className="p-3.5 rounded-xl bg-surface-container-lowest border border-primary/20 shadow-md flex flex-col gap-3 mt-1 animate-fadeIn">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-label-sm text-[11px] text-outline uppercase font-semibold">Start Date</span>
+                            <input
+                              type="date"
+                              value={startDate}
+                              onChange={(e) => handleStartDateChange(e.target.value)}
+                              className="px-2.5 py-1.5 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-border-subtle outline-none focus:ring-1 focus:ring-primary"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="font-label-sm text-[11px] text-outline uppercase font-semibold">End Date</span>
+                            <input
+                              type="date"
+                              value={endDate}
+                              min={startDate}
+                              onChange={(e) => handleEndDateChange(e.target.value)}
+                              className="px-2.5 py-1.5 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-border-subtle outline-none focus:ring-1 focus:ring-primary"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1.5 border-t border-border-subtle/70">
+                          <span className="font-label-sm text-label-sm text-on-surface font-medium">Trip Duration</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={handleDecrementDays}
+                              className="w-6 h-6 rounded bg-surface-container-low text-on-surface hover:bg-surface-container flex items-center justify-center font-bold text-xs cursor-pointer shadow-sm"
+                              title="Decrease days"
+                            >
+                              −
+                            </button>
+                            <span className="font-label-md text-label-md font-bold text-primary px-2">
+                              {durationDays} Days ({nights} Nights)
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleIncrementDays}
+                              className="w-6 h-6 rounded bg-surface-container-low text-on-surface hover:bg-surface-container flex items-center justify-center font-bold text-xs cursor-pointer shadow-sm"
+                              title="Increase days"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
                   {/* Traveler Stepper */}
                   <div className="flex flex-col gap-2">
                     <label className="font-label-md text-label-md text-on-surface-variant">Number of Explorers</label>
@@ -459,7 +627,7 @@ export default function TripPlannerView({ onNavigate }) {
                     ) : (
                       <>
                         <span className="material-symbols-outlined text-[20px] transition-transform group-hover:rotate-12">auto_fix_high</span>
-                        <span>Generate My Trip</span>
+                        <span>Generate {durationDays}-Day Trip Plan</span>
                         <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">arrow_forward</span>
                       </>
                     )}
@@ -515,12 +683,12 @@ export default function TripPlannerView({ onNavigate }) {
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <span className="font-label-md text-label-md text-on-surface font-semibold">
-                        AI Route Intelligence · October Window
+                        AI Route Intelligence · {durationDays}-Day Expedition
                       </span>
                       <p className="font-body-sm text-body-sm text-on-surface-variant">
                         {isGoa
-                          ? 'Mild 28°C sunset breezes around Mandovi estuary. Dudhsagar jeep safari morning slots avoid long wait lines.'
-                          : 'Mild 26°C sunset breezes around Pichola. Booking the Composite Museum Heritage Pass avoids 45-min peak ticketing queues.'}
+                          ? `Covering top coastal forts, Dudhsagar cascades, Old Goa cathedrals, and spice plantations across ${durationDays} days (${nights} nights).`
+                          : `Sequencing royal palaces, Lake Pichola ghats, monsoon viewpoints, and generational artisan guilds across ${durationDays} days (${nights} nights).`}
                       </p>
                     </div>
                   </div>
@@ -536,8 +704,8 @@ export default function TripPlannerView({ onNavigate }) {
                           <span className="material-symbols-outlined text-[14px]">route</span>
                         </div>
                         <div>
-                          <strong className="text-on-surface font-label-md">Topographic Step-Sequencing: </strong>
-                          <span className="text-on-surface-variant">Orders uphill monuments before midday heat to conserve stamina.</span>
+                          <strong className="text-on-surface font-label-md">Dynamic Day Sequencing: </strong>
+                          <span className="text-on-surface-variant">Plans exactly {durationDays} distinct days balancing morning, afternoon & evening activities.</span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3 font-body-sm text-body-sm">
@@ -545,8 +713,8 @@ export default function TripPlannerView({ onNavigate }) {
                           <span className="material-symbols-outlined text-[14px]">schedule</span>
                         </div>
                         <div>
-                          <strong className="text-on-surface font-label-md">Live Crowd Dispersion: </strong>
-                          <span className="text-on-surface-variant">Flags morning slots before tour group arrivals at sanctums.</span>
+                          <strong className="text-on-surface font-label-md">Opening-Hour Verification: </strong>
+                          <span className="text-on-surface-variant">Checks verified opening and closing hours for every scheduled stop.</span>
                         </div>
                       </li>
                       <li className="flex items-start gap-3 font-body-sm text-body-sm">
@@ -554,8 +722,8 @@ export default function TripPlannerView({ onNavigate }) {
                           <span className="material-symbols-outlined text-[14px]">verified</span>
                         </div>
                         <div>
-                          <strong className="text-on-surface font-label-md">Artisan & Culinary Verification: </strong>
-                          <span className="text-on-surface-variant">Routes through verified local establishments and generational artisans.</span>
+                          <strong className="text-on-surface font-label-md">Budget Balancing: </strong>
+                          <span className="text-on-surface-variant">Distributes accommodation across {nights} nights with safety buffer protection.</span>
                         </div>
                       </li>
                     </ul>
@@ -581,7 +749,7 @@ export default function TripPlannerView({ onNavigate }) {
                     <span className="font-label-sm text-label-sm text-on-surface-variant">Planned 3 days ago</span>
                   </div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant italic line-clamp-2">
-                    “The dynamic budget slider hit my ₹18,500 threshold precisely. Found hidden gems I never would have discovered on social media.”
+                    “The dynamic duration and budget selector adjusted my {durationDays}-day plan instantly. Every day was structured seamlessly.”
                   </p>
                   <div className="flex items-center gap-3 pt-1">
                     <span className="font-label-sm text-label-sm text-secondary font-medium">Verified Rover · 14 Expeditions</span>
