@@ -78,7 +78,9 @@ class RouteAndBudgetEngine:
         travelers: int,
         allocation_pcts: Dict[str, float],
         all_itinerary_days: List[Dict[str, Any]],
-        transit_mode: str = "auto_walk"
+        transit_mode: str = "auto_walk",
+        start_date: str = None,
+        end_date: str = None
     ) -> Dict[str, Any]:
         """
         Calculates category breakdown and verifies actual expenses against the budget.
@@ -105,8 +107,19 @@ class RouteAndBudgetEngine:
             total_route_distance_km += route_info["total_distance_km"]
             total_transit_cost += route_info["transit_cost"]
 
-        # Dining estimate based on travelers and duration
+        # Calculate nights based on date range if available, else duration_days - 1
         nights = max(duration_days - 1, 1)
+        if start_date and end_date:
+            try:
+                from datetime import datetime
+                d1 = datetime.strptime(start_date.strip()[:10], "%Y-%m-%d")
+                d2 = datetime.strptime(end_date.strip()[:10], "%Y-%m-%d")
+                calendar_nights = (d2 - d1).days
+                if calendar_nights > 0:
+                    nights = calendar_nights
+            except Exception:
+                nights = max(duration_days - 1, 1)
+
         per_night_stay = round(stay_target / nights, 2)
         estimated_dining_cost = round(dining_transit_target * 0.70, 2)
         actual_transit_cost = round(total_transit_cost, 2)

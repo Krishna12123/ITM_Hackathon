@@ -3,6 +3,16 @@ from typing import List, Dict, Any, Tuple
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
+def format_time_label(hour_float: float) -> str:
+    """
+    Converts decimal hour (e.g. 16.5) to formatted 12-hour time string (e.g. '04:30 PM').
+    """
+    h = int(hour_float)
+    m = int(round((hour_float - h) * 60))
+    suffix = "AM" if h < 12 else "PM"
+    display_h = h if 1 <= h <= 12 else (h - 12 if h > 12 else 12)
+    return f"{display_h:02d}:{m:02d} {suffix}"
+
 def haversine_distance(coord1: Tuple[float, float], coord2: Tuple[float, float]) -> float:
     """
     Computes great-circle distance in kilometers between two GPS points.
@@ -39,31 +49,44 @@ class ItineraryOptimizer:
         max_daily_activities: int = 3
     ) -> List[List[Dict[str, Any]]]:
         """
-        Geographically clusters attractions into day groups using greedy spatial proximity.
+        Partitions attractions across days balancing time-of-day suitability
+        (Morning, Afternoon, Evening) and geographic proximity.
         """
         if not attractions:
             return [[] for _ in range(num_days)]
 
         days: List[List[Dict[str, Any]]] = [[] for _ in range(num_days)]
-        unassigned = list(attractions)
 
+        # Separate into time buckets
+        mornings = [a for a in attractions if a.get("best_visit_time") == "Morning"]
+        afternoons = [a for a in attractions if a.get("best_visit_time") == "Afternoon"]
+        evenings = [a for a in attractions if a.get("best_visit_time") == "Evening"]
+        others = [a for a in attractions if a not in mornings and a not in afternoons and a not in evenings]
+
+        # Fill each day with one morning, one afternoon, and one evening attraction
         for d in range(num_days):
-            if not unassigned:
-                break
-            
-            # Start day with highest ranked unassigned attraction as anchor
-            anchor = unassigned.pop(0)
-            days[d].append(anchor)
+            if mornings:
+                days[d].append(mornings.pop(0))
+            elif others:
+                days[d].append(others.pop(0))
 
-            # Find closest matching attractions to anchor for spatial clustering
-            while len(days[d]) < max_daily_activities and unassigned:
-                anchor_coord = (anchor["latitude"], anchor["longitude"])
-                # Sort remaining by distance to the day's anchor
-                unassigned.sort(
-                    key=lambda p: haversine_distance(anchor_coord, (p["latitude"], p["longitude"]))
-                )
-                nearest = unassigned.pop(0)
-                days[d].append(nearest)
+            if afternoons:
+                days[d].append(afternoons.pop(0))
+            elif others:
+                days[d].append(others.pop(0))
+
+            if evenings:
+                days[d].append(evenings.pop(0))
+            elif others:
+                days[d].append(others.pop(0))
+
+        # Distribute any remaining places up to max_daily_activities
+        remaining = mornings + afternoons + evenings + others
+        for place in remaining:
+            for d in range(num_days):
+                if len(days[d]) < max_daily_activities:
+                    days[d].append(place)
+                    break
 
         return days
 
@@ -142,13 +165,42 @@ class ItineraryOptimizer:
         for d_idx, day_items in enumerate(day_partitions):
             optimized_order = self.optimize_day_route_ortools(day_items, transit_mode)
 
-            # Assign schedule time slots (Morning, Afternoon, Evening)
+            # Sort within day chronologically: Morning -> Afternoon -> Evening
+            time_priority = {"Morning": 0, "Afternoon": 1, "Evening": 2}
+            optimized_order.sort(key=lambda p: time_priority.get(p.get("best_visit_time"), 1))
+
             scheduled_items = []
-            time_slots = ["08:30 AM – 11:30 AM", "12:30 PM – 03:30 PM", "05:00 PM – 08:00 PM", "08:30 PM – 10:00 PM"]
-            
+            slot_definitions = [
+                {"label": "08:30 AM – 11:30 AM", "start_hour": 8.5, "end_hour": 11.5},
+                {"label": "12:30 PM – 03:30 PM", "start_hour": 12.5, "end_hour": 15.5},
+                {"label": "05:00 PM – 07:30 PM", "start_hour": 17.0, "end_hour": 19.5},
+                {"label": "08:00 PM – 09:30 PM", "start_hour": 20.0, "end_hour": 21.5}
+            ]
+
             for i, item in enumerate(optimized_order):
                 item_copy = dict(item)
-                item_copy["assigned_slot"] = time_slots[i % len(time_slots)]
+                slot = slot_definitions[i % len(slot_definitions)]
+                s_start = slot["start_hour"]
+                s_end = slot["end_hour"]
+
+                open_h = item.get("open_hour")
+                close_h = item.get("close_hour")
+
+                # Respect opening time if attraction opens later than slot start
+                if open_h is not None and s_start < open_h:
+                    s_start = open_h
+
+                # Respect closing time if attraction closes earlier than slot end
+                if close_h is not None and s_end > close_h:
+                    s_end = close_h
+                    # Adjust start if needed so duration is accommodated
+                    duration_hrs = min(item.get("suggested_duration_minutes", 90) / 60.0, 1.5)
+                    s_start = max(s_end - duration_hrs, open_h if open_h is not None else 8.0)
+
+                label = f"{format_time_label(s_start)} – {format_time_label(s_end)}"
+                item_copy["assigned_slot"] = label
+                item_copy["slot_start_hour"] = round(s_start, 2)
+                item_copy["slot_end_hour"] = round(s_end, 2)
                 scheduled_items.append(item_copy)
 
             optimized_days.append({

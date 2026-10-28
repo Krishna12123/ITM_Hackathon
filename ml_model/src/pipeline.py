@@ -76,7 +76,9 @@ class ItineraryMLPipeline:
             travelers=travelers,
             allocation_pcts=allocations,
             all_itinerary_days=optimized_schedule,
-            transit_mode=transit_mode
+            transit_mode=transit_mode,
+            start_date=user_preferences.get("start_date"),
+            end_date=user_preferences.get("end_date")
         )
 
         # 5. AI Synthesis & Final Smart Itinerary Packaging (Module 5 & 6)
@@ -107,10 +109,34 @@ class ItineraryMLPipeline:
                 interests=interests
             )
 
+            def format_sequence_item(item):
+                if not item:
+                    return None
+                return {
+                    "id": item.get("id"),
+                    "time_slot": item.get("assigned_slot", ""),
+                    "activity_title": item.get("place_name", ""),
+                    "category": item.get("category", ""),
+                    "description": item.get("description", ""),
+                    "coordinates": {
+                        "lat": item.get("latitude"),
+                        "lng": item.get("longitude")
+                    },
+                    "entry_fee": item.get("entry_fee", 0),
+                    "open_hour": item.get("open_hour"),
+                    "close_hour": item.get("close_hour"),
+                    "slot_start_hour": item.get("slot_start_hour"),
+                    "slot_end_hour": item.get("slot_end_hour"),
+                    "suggested_duration_minutes": item.get("suggested_duration_minutes"),
+                    "tags": item.get("tags", []),
+                    "spiritual_tags": item.get("spiritual_tags", item.get("spiritual_preferences", [])),
+                    "image_url": item.get("image_url", "")
+                }
+
             # Assign places into Morning, Afternoon, and Evening sequences
             morning_item = places[0] if len(places) > 0 else None
-            afternoon_item = places[1] if len(places) > 1 else places[0] if places else None
-            evening_item = places[2] if len(places) > 2 else places[-1] if places else None
+            afternoon_item = places[1] if len(places) > 1 else None
+            evening_item = places[2] if len(places) > 2 else None
 
             final_days.append({
                 "day_number": day_num,
@@ -121,42 +147,9 @@ class ItineraryMLPipeline:
                 "transit_mode": transit_mode,
                 "insider_travel_tip": narrative.get("insider_travel_tip", ""),
                 "cultural_etiquette": narrative.get("cultural_etiquette", ""),
-                "morning_sequence": {
-                    "time_slot": morning_item.get("assigned_slot", "08:30 AM – 11:30 AM") if morning_item else "",
-                    "activity_title": morning_item.get("place_name", "") if morning_item else "",
-                    "category": morning_item.get("category", "") if morning_item else "",
-                    "description": morning_item.get("description", "") if morning_item else "",
-                    "coordinates": {
-                        "lat": morning_item.get("latitude") if morning_item else 0.0,
-                        "lng": morning_item.get("longitude") if morning_item else 0.0
-                    },
-                    "entry_fee": morning_item.get("entry_fee", 0) if morning_item else 0,
-                    "image_url": morning_item.get("image_url", "") if morning_item else ""
-                },
-                "afternoon_immersion": {
-                    "time_slot": afternoon_item.get("assigned_slot", "12:30 PM – 03:30 PM") if afternoon_item else "",
-                    "activity_title": afternoon_item.get("place_name", "") if afternoon_item else "",
-                    "category": afternoon_item.get("category", "") if afternoon_item else "",
-                    "description": afternoon_item.get("description", "") if afternoon_item else "",
-                    "coordinates": {
-                        "lat": afternoon_item.get("latitude") if afternoon_item else 0.0,
-                        "lng": afternoon_item.get("longitude") if afternoon_item else 0.0
-                    },
-                    "entry_fee": afternoon_item.get("entry_fee", 0) if afternoon_item else 0,
-                    "image_url": afternoon_item.get("image_url", "") if afternoon_item else ""
-                },
-                "evening_finale": {
-                    "time_slot": evening_item.get("assigned_slot", "05:00 PM – 08:00 PM") if evening_item else "",
-                    "activity_title": evening_item.get("place_name", "") if evening_item else "",
-                    "category": evening_item.get("category", "") if evening_item else "",
-                    "description": evening_item.get("description", "") if evening_item else "",
-                    "coordinates": {
-                        "lat": evening_item.get("latitude") if evening_item else 0.0,
-                        "lng": evening_item.get("longitude") if evening_item else 0.0
-                    },
-                    "entry_fee": evening_item.get("entry_fee", 0) if evening_item else 0,
-                    "image_url": evening_item.get("image_url", "") if evening_item else ""
-                },
+                "morning_sequence": format_sequence_item(morning_item),
+                "afternoon_immersion": format_sequence_item(afternoon_item),
+                "evening_finale": format_sequence_item(evening_item),
                 "places_list": places
             })
 
