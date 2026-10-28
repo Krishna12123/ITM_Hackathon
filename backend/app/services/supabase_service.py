@@ -4,7 +4,7 @@ import time
 import urllib.request
 import urllib.error
 from typing import Dict, Any, Optional, List
-from app.core.config import settings
+from ..core.config import settings
 
 logger = logging.getLogger("supabase_service")
 
