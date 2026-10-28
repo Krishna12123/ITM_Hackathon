@@ -109,25 +109,37 @@ export default function App() {
   };
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    if (tab === 'experiences') {
+    let targetTab = tab;
+    if (tab === 'home') targetTab = 'experiences';
+    if (tab === 'explore') targetTab = 'experiences';
+
+    setActiveTab(targetTab);
+    if (targetTab === 'experiences') {
       window.history.pushState({ tab: 'experiences' }, '', '/');
-    } else if (tab === 'place-details') {
+      if (tab === 'explore') {
+        setTimeout(() => {
+          const el = document.getElementById('explore-states-section');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+    } else if (targetTab === 'place-details') {
       window.history.pushState({ tab: 'place-details' }, '', '/place-details');
-    } else if (tab === 'contribute') {
+    } else if (targetTab === 'contribute') {
       window.history.pushState({ tab: 'contribute' }, '', '/contribute');
-    } else if (tab === 'profile') {
+    } else if (targetTab === 'profile') {
       window.history.pushState({ tab: 'profile' }, '', '/profile');
-    } else if (tab === 'planner') {
+    } else if (targetTab === 'planner') {
       window.history.pushState({ tab: 'planner' }, '', '/planner');
-    } else if (tab === 'generating') {
+    } else if (targetTab === 'generating') {
       window.history.pushState({ tab: 'generating' }, '', '/generating');
-    } else if (tab === 'itinerary') {
+    } else if (targetTab === 'itinerary') {
       window.history.pushState({ tab: 'itinerary' }, '', '/itinerary');
-    } else if (tab === 'route_budget') {
+    } else if (targetTab === 'route_budget') {
       window.history.pushState({ tab: 'route_budget' }, '', '/route-budget');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (tab !== 'explore') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // Browser route synchronization on load and on popstate (browser back/forward)

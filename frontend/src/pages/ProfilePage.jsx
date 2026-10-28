@@ -399,8 +399,20 @@ export default function ProfilePage({
       {/* ====================================================================
           PROFILE OVERVIEW HEADER (Heritage Indian Tourism Aesthetic)
           ==================================================================== */}
-      <section className="bg-gradient-to-b from-white via-white/80 to-[#FAF7F0] border-b border-[#E8E3D7] pt-8 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white via-white/80 to-[#FAF7F0] border-b border-[#E8E3D7] pt-8 pb-8 px-4 sm:px-6 lg:px-8">
+        {/* Subtle Tourism-Inspired Banner Texture for Explorer, or Subtle Abstract Gradient for Admin */}
+        {!isAdmin ? (
+          <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+            <img
+              src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1600&q=80"
+              alt="Indian Tourism Background"
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+        ) : (
+          <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[radial-gradient(#155E63_1px,transparent_1px)] [background-size:16px_16px]" />
+        )}
+        <div className="max-w-7xl mx-auto relative z-10">
           
           <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E3D7] shadow-sm relative overflow-hidden transition-all duration-300">
             {/* Top Decorative Indian Motif Accent Stripe */}

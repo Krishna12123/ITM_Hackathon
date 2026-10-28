@@ -354,36 +354,37 @@ export default function ContributionFormPage({ onCancel, onShowToast }) {
 
   return (
     <div className="min-h-screen bg-canvas pb-20 animate-fadeInUp">
-      {/* 2. Page Header */}
-      <section className="bg-gradient-to-b from-card to-canvas border-b border-border-subtle py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      {/* 2. Scenic Community Travel Banner */}
+      <section className="relative overflow-hidden bg-slate-950 text-white py-10 sm:py-14 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=2000&q=80"
+            alt="Local Cultural Heritage & Community Tourism"
+            className="w-full h-full object-cover object-center opacity-35 transition-transform duration-700 hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/45" />
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto">
           {/* Back button */}
           <button
             onClick={onCancel}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-primary transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors mb-4 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Discovery</span>
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold tracking-wider uppercase mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F45B0B] text-white text-[11px] font-bold tracking-wider uppercase mb-3 shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>COMMUNITY POWERED • PRESERVING TRADITIONS</span>
           </div>
 
-          <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight leading-tight">
+          <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-white tracking-tight leading-tight">
             Share a Hidden Gem
           </h1>
-          <p className="mt-2 text-slate-600 text-sm sm:text-base leading-relaxed">
-            Your local knowledge can help travelers discover the real beauty of your community.
+          <p className="mt-2 text-slate-200 text-sm sm:text-base leading-relaxed max-w-2xl">
+            Your local knowledge can help travelers discover the authentic beauty, culinary heritage, and stories of your community.
           </p>
-
-          <div className="mt-4 p-3.5 bg-subtle rounded-lg border border-border-subtle text-xs text-slate-600 flex items-start gap-2.5">
-            <Info className="w-4 h-4 text-tertiary shrink-0 mt-0.5" />
-            <p className="leading-relaxed">
-              Every community contribution fosters sustainable, distributed tourism that directly benefits local culture-bearers, artisans, and family-run micro-enterprises rather than crowded commercial circuits.
-            </p>
-          </div>
         </div>
       </section>
 

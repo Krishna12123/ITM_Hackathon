@@ -231,6 +231,27 @@ export default function PlaceDetailsPage({
               </p>
             </section>
 
+            {/* Supporting Images Gallery */}
+            {destination.gallery && destination.gallery.length > 0 && (
+              <section className="bg-card rounded-xl p-6 border border-border-subtle shadow-level-1">
+                <h2 className="font-display font-bold text-xl text-slate-900 mb-4 flex items-center gap-2">
+                  <span>Destination Photo Gallery</span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {destination.gallery.map((imgUrl, idx) => (
+                    <div key={idx} className="h-40 sm:h-44 rounded-xl overflow-hidden shadow-xs border border-border-subtle group">
+                      <img
+                        src={imgUrl}
+                        alt={`${destination.name} view ${idx + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Highlights Section */}
             <section className="bg-card rounded-xl p-6 border border-border-subtle shadow-level-1">
               <h2 className="font-display font-bold text-xl text-slate-900 mb-4 flex items-center gap-2">

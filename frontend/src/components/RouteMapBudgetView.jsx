@@ -14,7 +14,30 @@ export default function RouteMapBudgetView({ onNavigate }) {
   }, []);
 
   return (
-  <main className="w-full pt-20 bg-surface min-h-[calc(100vh-16rem)]">
+  <main className="w-full bg-surface min-h-[calc(100vh-16rem)]">
+    {/* Minimal Route & Landscape Banner */}
+    <section className="relative overflow-hidden bg-slate-950 text-white py-10 sm:py-14 px-6 lg:px-12 border-b border-[#E5E7EB]">
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=2000&q=80"
+          alt="Scenic Mountain Route Landscape"
+          className="w-full h-full object-cover object-center opacity-40 transition-transform duration-700 hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/40" />
+      </div>
+      <div className="relative z-10 max-w-7xl mx-auto flex flex-col gap-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#155E63] text-white text-[11px] font-bold tracking-wider uppercase self-start shadow-sm">
+          <span className="material-symbols-outlined text-[14px]">route</span>
+          <span>Spatial Navigation & Financial Pulse</span>
+        </div>
+        <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+          Trip Route Map & Budget Analytics
+        </h1>
+        <p className="text-slate-200 text-xs sm:text-sm max-w-2xl leading-relaxed">
+          Interactive route polyline, distance metrics, and real-time category expense breakdowns.
+        </p>
+      </div>
+    </section>
     <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8">
       <div className="flex flex-col w-full">
         <div className="flex flex-col gap-6">
