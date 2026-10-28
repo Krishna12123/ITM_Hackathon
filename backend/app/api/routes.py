@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import (
+from ..models.schemas import (
     HealthResponse,
     PredictionRequest,
     PredictionResponse,
@@ -8,9 +8,9 @@ from app.models.schemas import (
     TripInputCreate,
     TripInputResponse
 )
-from app.services.ml_service import ml_service
-from app.services.supabase_service import supabase_service
-from app.core.config import settings
+from ..services.ml_service import ml_service
+from ..services.supabase_service import supabase_service
+from ..core.config import settings
 
 router = APIRouter()
 
@@ -206,3 +206,47 @@ def list_trips():
         return {"source": "supabase", "trips": remote["data"]}
     
     return {"source": "local_cache", "trips": supabase_service.local_cache}
+
+
+from ..services.payment_service import payment_service
+from ..models.schemas import (
+    PaymentCheckoutRequest,
+    PaymentCheckoutResponse,
+    PaymentVerifyRequest,
+    PaymentVerifyResponse
+)
+
+@router.post("/payments/create-checkout-session", response_model=PaymentCheckoutResponse)
+def create_payment_checkout_session(request: PaymentCheckoutRequest):
+    """
+    Creates a payment checkout order for itinerary booking.
+    """
+    session = payment_service.create_checkout_session(
+        amount=request.amount,
+        trip_destination=request.trip_destination,
+        customer_email=request.customer_email,
+        customer_name=request.customer_name,
+        success_url=request.success_url,
+        cancel_url=request.cancel_url
+    )
+    return session
+
+@router.post("/payments/verify", response_model=PaymentVerifyResponse)
+def verify_payment_session(request: PaymentVerifyRequest):
+    """
+    Verifies payment status for a checkout session.
+    """
+    result = payment_service.verify_payment(request.session_id)
+    return result
+
+@router.get("/payments/checkout-mock/{session_id}")
+def checkout_mock_page(session_id: str):
+    """
+    Fallback mock checkout verification endpoint for testing without live credentials.
+    """
+    res = payment_service.verify_payment(session_id)
+    return {
+        "status": "success",
+        "message": "Payment verified in YatraSathi test gateway",
+        "details": res
+    }
