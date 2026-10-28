@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { submitTripInputs } from '../services/api';
+import { submitTripInputs, fetchItineraryPlan } from '../services/api';
 import { supabase } from '../lib/supabaseClient';
 
 export default function TripPlannerView({ onNavigate }) {
@@ -108,9 +108,8 @@ export default function TripPlannerView({ onNavigate }) {
   const onGenerate = async () => {
     const btn = document.getElementById('generate-btn');
     if (!btn) return;
-    const originalContent = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Connecting to Database & Synthesizing...</span>';
+    btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Synthesizing ML Itinerary & Storing in Supabase...</span>';
 
     // 1. Gather all active interests and themes
     const activeInterests = Array.from(document.querySelectorAll('#interest-container .interest-chip.active'))
@@ -159,22 +158,23 @@ export default function TripPlannerView({ onNavigate }) {
       console.warn('LocalStorage error:', e);
     }
 
-    // Submit to FastAPI backend (which runs retry loop to Supabase)
-    submitTripInputs(tripPayload).catch(err => console.warn('Backend sync:', err));
-
-    // Also attempt direct client Supabase insert if table is created
+    // 6. Generate ML smart itinerary and persist in Supabase
     try {
-      supabase.from('trip_inputs').insert(tripPayload).then(({ data, error }) => {
-        if (error) console.info('Supabase client insert note:', error.message);
-        else console.log('Successfully recorded to Supabase:', data);
-      });
-    } catch (e) {
-      console.info('Supabase client pending:', e);
+      const plan = await fetchItineraryPlan(tripPayload);
+      if (plan) {
+        localStorage.setItem('generated_smart_itinerary', JSON.stringify(plan));
+        if (plan.trip_id) {
+          localStorage.setItem('active_trip_id', plan.trip_id);
+        }
+      }
+    } catch (err) {
+      console.warn('ML Itinerary fetch note:', err);
     }
 
-    setTimeout(() => {
-      if (onNavigate) onNavigate('generating');
-    }, 900);
+    // 7. Direct navigation to Smart Itinerary where all UI is populated by ML model
+    if (onNavigate) {
+      onNavigate('itinerary');
+    }
   };
 
   return (
