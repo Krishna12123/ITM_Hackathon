@@ -82,12 +82,35 @@ class ItineraryMLPipeline:
         )
 
         # 5. AI Synthesis & Final Smart Itinerary Packaging (Module 5 & 6)
-        day_themes = [
-            "Old City Heritage Sanctum & Lake Sunset",
-            "Royal Palaces, Hilltop Monsoons & Nature Trails",
-            "Artisan Guilds, Miniature Painting & Cultural Immersion",
-            "Sacred Temples, Scenic Waterfronts & Farewell Feast"
-        ]
+        dest_lower = destination.lower()
+        if "goa" in dest_lower:
+            day_themes = [
+                "Coastal Fortresses, Old Goa Cathedrals & Latin Quarter",
+                "Spice Plantations, Jungle Cascades & Heritage Sanctums",
+                "Artisan Beach Markets, Sunsets & Bohemian Vibes",
+                "Cliff Bastions, Dolphin Coves & Mandovi Twilight Cruise"
+            ]
+        elif "jaipur" in dest_lower:
+            day_themes = [
+                "Pink City Palaces & UNESCO Heritage Forts",
+                "Astronomy Observatories & Stepwells",
+                "Artisan Bazaars & Traditional Puppetry",
+                "Hilltop Nahargarh Sunset & Farewell Feast"
+            ]
+        elif "varanasi" in dest_lower:
+            day_themes = [
+                "Sacred Ghats, Morning Aarti & Kashi Sanctum",
+                "Sarnath Buddhist Stupas & Silk Weavers",
+                "Spiritual Alleyways & Evening Ganga Aarti",
+                "Historic Forts & Waterfront Farewell"
+            ]
+        else:
+            day_themes = [
+                "Old City Heritage Sanctum & Lake Sunset",
+                "Royal Palaces, Hilltop Monsoons & Nature Trails",
+                "Artisan Guilds, Miniature Painting & Cultural Immersion",
+                "Sacred Temples, Scenic Waterfronts & Farewell Feast"
+            ]
 
         final_days = []
         all_map_waypoints = []

@@ -57,7 +57,19 @@ class GeminiService:
                 logger.warning(f"Gemini API generation fallback triggered: {e}")
 
         # Deterministic Domain-Knowledge Fallback
-        if "udaipur" in destination.lower():
+        dest_low = destination.lower()
+        if "goa" in dest_low:
+            return {
+                "destination": "Goa, India",
+                "destination_overview": "Famed for its sun-kissed Arabian coastline, Portuguese-colonial Latin quarters, UNESCO cathedrals, and vibrant spice plantations, Goa offers an eclectic mix of coastal heritage, sacred shrines, and bohemian culture.",
+                "highlights": ["Aguada Coastal Fort", "Basilica of Bom Jesus", "Fontainhas Latin Quarter", "Palolem Beach"],
+                "hidden_gems": ["Cabo de Rama clifftop ramparts", "Sahakari organic spice trails", "Dudhsagar jungle cascades"],
+                "cultural_experiences": ["Fugdi and Dekhni folk performances on Mandovi", "Heritage Portuguese villa architectural walks"],
+                "local_food_experiences": ["Goan Fish Curry Thali", "Pebbly Poee with traditional spices", "Bebinca dessert"],
+                "seasonal_recommendations": "Ideal from October through March with cool sea breezes and clear coastal twilights."
+            }
+
+        if "udaipur" in dest_low:
             return {
                 "destination": "Udaipur, Rajasthan",
                 "destination_overview": "Known as the City of Lakes and the Venice of the East, Udaipur offers a majestic blend of Rajput royal heritage, ornate palaces, and serene lakes flanked by the Aravali ranges.",

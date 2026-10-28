@@ -130,8 +130,11 @@ export default function TripPlannerView({ onNavigate }) {
     const transitTitle = activeTransitEl ? (activeTransitEl.getAttribute('title') || 'local_taxi') : 'local_taxi';
 
     // 5. Construct full trip inputs payload
+    const destInput = document.getElementById('destination-input');
+    const finalDest = (destInput && destInput.value.trim()) ? destInput.value.trim() : (destination || 'Goa, India');
+
     const tripPayload = {
-      destination: destination || 'Udaipur, Rajasthan, India',
+      destination: finalDest,
       start_date: 'Oct 14',
       end_date: 'Oct 18',
       days: 4,
@@ -225,19 +228,38 @@ export default function TripPlannerView({ onNavigate }) {
                 </label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined absolute left-3.5 text-[20px] text-outline pointer-events-none">search</span>
-                  <input className="w-full pl-10 pr-10 py-3 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary-fixed transition-all" id="destination-input" placeholder="Search destination, region or national park..." type="text" value="Udaipur, Rajasthan" />
-                  <button className="absolute right-3 text-outline hover:text-on-surface transition-colors" onClick={onClearDestination} type="button">
+                  <input 
+                    className="w-full pl-10 pr-10 py-3 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary-fixed transition-all" 
+                    id="destination-input" 
+                    placeholder="Search destination, region or national park..." 
+                    type="text" 
+                    value={destination} 
+                    onChange={(e) => setDestination(e.target.value)}
+                  />
+                  <button className="absolute right-3 text-outline hover:text-on-surface transition-colors cursor-pointer" onClick={onClearDestination} type="button">
                     <span className="material-symbols-outlined text-[18px]">cancel</span>
                   </button>
                 </div>
                 {/* Popular Pills */}
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
                   <span className="font-label-sm text-label-sm text-on-surface-variant mr-1">Trending:</span>
-                  <button className="px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-label-sm transition-colors" onClick={() => onSelectDestination("Jaipur")} type="button">Jaipur</button>
-                  <button className="px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-label-sm transition-colors" onClick={() => onSelectDestination("Varanasi")} type="button">Varanasi</button>
-                  <button className="px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-label-sm transition-colors" onClick={() => onSelectDestination("Hampi")} type="button">Hampi</button>
-                  <button className="px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-label-sm transition-colors" onClick={() => onSelectDestination("Goa")} type="button">Goa</button>
-                  <button className="px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm transition-colors" onClick={() => onSelectDestination("Udaipur")} type="button">Udaipur</button>
+                  {["Goa", "Jaipur", "Varanasi", "Hampi", "Udaipur"].map((city) => {
+                    const isSelected = destination.toLowerCase().includes(city.toLowerCase());
+                    return (
+                      <button 
+                        key={city}
+                        className={`px-2.5 py-1 rounded-full font-label-sm text-label-sm transition-colors cursor-pointer ${
+                          isSelected 
+                            ? "bg-primary text-on-primary font-bold shadow-sm" 
+                            : "bg-surface-container-low hover:bg-surface-container text-on-surface-variant"
+                        }`}
+                        onClick={() => onSelectDestination(city)} 
+                        type="button"
+                      >
+                        {city}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               {/* Field 2: Dates & Travelers Split Grid */}
