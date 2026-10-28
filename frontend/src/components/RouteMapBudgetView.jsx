@@ -44,18 +44,26 @@ export default function RouteMapBudgetView({ onNavigate }) {
 
             Optimal Route Verified
                           </span>
-                <span className="font-label-sm text-label-sm text-outline">Udaipur, Rajasthan · 24°34'N 73°41'E</span>
+                <span className="font-label-sm text-label-sm text-outline">{destinationName}</span>
               </div>
               <h1 className="font-headline-xl text-headline-xl text-primary tracking-tight font-bold">Trip Route Map & Financial Pulse</h1>
-              <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">Interactive spatial navigation, elevation profile, and live category budget distribution for Udaipur.</p>
+              <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">Interactive spatial navigation, elevation profile, and live category budget distribution for {destinationName}.</p>
             </div>
             {/* Action Utilities */}
             <div className="flex items-center gap-3 shrink-0">
+              <button 
+                onClick={() => onNavigate && onNavigate('itinerary')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container-lowest shadow-sm hover:shadow text-slate-800 font-label-lg text-label-lg transition-all duration-150 cursor-pointer" 
+                type="button"
+              >
+                <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                <span>Itinerary View</span>
+              </button>
               <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container-lowest shadow-sm hover:shadow text-primary font-label-lg text-label-lg transition-all duration-150" type="button">
                 <span className="material-symbols-outlined text-[18px]">cloud_sync</span>
                 <span>Offline Ready</span>
               </button>
-              <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow hover:opacity-95 transition-all duration-150" type="button">
+              <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg shadow hover:opacity-95 transition-all duration-150" type="button">
                 <span className="material-symbols-outlined text-[18px]">share_location</span>
                 <span>Export GPX & Ledger</span>
               </button>

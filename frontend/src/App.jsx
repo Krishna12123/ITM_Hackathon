@@ -109,22 +109,23 @@ export default function App() {
   };
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    if (tab === 'experiences') {
+    const normalizedTab = (tab === 'route-budget' || tab === 'route_budget') ? 'route_budget' : tab;
+    setActiveTab(normalizedTab);
+    if (normalizedTab === 'experiences') {
       window.history.pushState({ tab: 'experiences' }, '', '/');
-    } else if (tab === 'place-details') {
+    } else if (normalizedTab === 'place-details') {
       window.history.pushState({ tab: 'place-details' }, '', '/place-details');
-    } else if (tab === 'contribute') {
+    } else if (normalizedTab === 'contribute') {
       window.history.pushState({ tab: 'contribute' }, '', '/contribute');
-    } else if (tab === 'profile') {
+    } else if (normalizedTab === 'profile') {
       window.history.pushState({ tab: 'profile' }, '', '/profile');
-    } else if (tab === 'planner') {
+    } else if (normalizedTab === 'planner') {
       window.history.pushState({ tab: 'planner' }, '', '/planner');
-    } else if (tab === 'generating') {
+    } else if (normalizedTab === 'generating') {
       window.history.pushState({ tab: 'generating' }, '', '/generating');
-    } else if (tab === 'itinerary') {
+    } else if (normalizedTab === 'itinerary') {
       window.history.pushState({ tab: 'itinerary' }, '', '/itinerary');
-    } else if (tab === 'route_budget') {
+    } else if (normalizedTab === 'route_budget') {
       window.history.pushState({ tab: 'route_budget' }, '', '/route-budget');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
