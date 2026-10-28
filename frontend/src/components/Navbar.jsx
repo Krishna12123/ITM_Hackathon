@@ -1,97 +1,94 @@
 import React from 'react';
+import { Compass, MapPin, Sparkles, Luggage, Heart, PlusCircle, User, Calendar, Route, Cpu } from 'lucide-react';
 
-export default function Navbar({ currentView, setCurrentView, onOpenTrip, tripCount = 0 }) {
-  const views = [
-    { id: 'experiences', path: '/experiences', label: 'Experiences' },
-    { id: 'place-details', path: '/place-details', label: 'Place Details' },
-    { id: 'planner', path: '/planner', label: 'Itinerary Planner' },
-    { id: 'generating', path: '/generating', label: 'AI Synthesis' },
-    { id: 'itinerary', path: '/itinerary', label: 'Smart Itinerary' },
-    { id: 'route_budget', path: '/route-budget', label: 'Route & Budget' },
-    { id: 'contribute', path: '/contribute', label: 'Share a Gem' },
+export default function Navbar({ activeTab, setActiveTab, tripItems = [], favoritesCount = 0, onOpenTrip }) {
+  const navItems = [
+    { id: 'experiences', label: 'Experiences', icon: Sparkles },
+    { id: 'place-details', label: 'Place Details', icon: MapPin },
+    { id: 'planner', label: 'AI Planner', icon: Calendar },
+    { id: 'itinerary', label: 'Smart Itinerary', icon: Cpu },
+    { id: 'route_budget', label: 'Route & Budget', icon: Route },
+    { id: 'contribute', label: 'Share a Gem', icon: PlusCircle },
   ];
 
   return (
-    <header className="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-      <div className="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-        
-        {/* Brand */}
-        <a 
-          href="/planner"
-          onClick={(e) => {
-            e.preventDefault();
-            setCurrentView('planner');
-          }}
-          className="flex items-center gap-2.5 shrink-0 cursor-pointer no-underline"
-        >
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm">
-            <span className="material-symbols-outlined text-[20px]">explore</span>
+    <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border-subtle shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo & Brand */}
+          <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => setActiveTab('experiences')}>
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-level-1">
+              <Compass className="w-6 h-6 stroke-[2.2]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-display font-bold text-xl text-slate-900 tracking-tight">
+                  YatraSaathi
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  TerraVenture
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 hidden sm:block">Community-Powered Tourism</p>
+            </div>
           </div>
-          <div>
-            <span className="font-display font-bold text-lg text-primary tracking-tight block leading-tight">
-              YatraSathi
-            </span>
+
+          {/* Center Navigation Tabs (scrollable on tablet/mobile) */}
+          <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1 scrollbar-none max-w-[50vw] sm:max-w-none">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`px-3 py-2 rounded-full text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap ${
+                    isActive
+                      ? 'bg-primary text-white shadow-sm font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-subtle'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right Action: My Trip Drawer Trigger, Favorites, & Profile */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="hidden lg:flex items-center gap-1 text-xs text-slate-500 bg-subtle px-3 py-1.5 rounded-full border border-border-subtle">
+              <Heart className="w-3.5 h-3.5 text-primary fill-primary" />
+              <span>{favoritesCount} saved</span>
+            </div>
+
+            <button
+              onClick={onOpenTrip}
+              className="relative flex items-center gap-2 bg-canvas hover:bg-subtle border border-border-subtle text-slate-900 px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all hover:border-primary active:scale-98 shadow-sm"
+            >
+              <Luggage className="w-4 h-4 text-primary" />
+              <span className="hidden xs:inline">My Trip</span>
+              {tripItems.length > 0 && (
+                <span className="w-5 h-5 rounded-full bg-primary text-white text-[11px] font-bold flex items-center justify-center animate-pulse">
+                  {tripItems.length}
+                </span>
+              )}
+            </button>
+
+            {/* Profile / Account Trigger */}
+            <button
+              onClick={() => setActiveTab('profile')}
+              title="Profile & Moderation"
+              className={`p-2 rounded-full transition-all border ${
+                activeTab === 'profile'
+                  ? 'bg-primary text-white border-primary shadow-sm'
+                  : 'bg-canvas hover:bg-subtle text-slate-700 border-border-subtle hover:border-primary'
+              }`}
+            >
+              <User className="w-4 h-4" />
+            </button>
           </div>
-        </a>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 overflow-x-auto">
-          {views.map((v) => {
-            const isActive = currentView === v.id;
-            return (
-              <a
-                key={v.id}
-                href={v.path}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentView(v.id);
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap no-underline ${
-                  isActive
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
-                }`}
-              >
-                {v.label}
-              </a>
-            );
-          })}
-        </nav>
-
-        {/* Right Action Icons & Trip / Profile */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          {/* My Trip Trigger */}
-          <button
-            onClick={onOpenTrip}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-xs font-semibold text-on-surface border border-outline-variant/40 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px] text-primary">luggage</span>
-            <span className="hidden sm:inline">My Trip</span>
-            {tripCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
-                {tripCount}
-              </span>
-            )}
-          </button>
-
-          {/* Profile Button */}
-          <a
-            href="/profile"
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentView('profile');
-            }}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-              currentView === 'profile'
-                ? 'bg-primary text-white ring-2 ring-primary/30'
-                : 'bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40'
-            }`}
-            title="Profile & Moderation"
-          >
-            <span className="material-symbols-outlined text-[18px]">person</span>
-          </a>
         </div>
-
       </div>
     </header>
   );

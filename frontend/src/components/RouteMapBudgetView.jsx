@@ -117,9 +117,9 @@ export default function RouteMapBudgetView({ onNavigate }) {
                   <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 700 460">
                     <defs>
                       <lineargradient id="routeGradient" x1="0%" x2="100%" y1="0%" y2="100%">
-                        <stop offset="0%" stopColor="#006b5f" stopOpacity="0.9" />
-                        <stop offset="50%" stopColor="#3cddc7" stopOpacity="1" />
-                        <stop offset="100%" stopColor="#0d5c75" stopOpacity="0.9" />
+                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.9" />
+                        <stop offset="50%" stopColor="#FED7AA" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#C2410C" stopOpacity="0.9" />
                       </lineargradient>
                       <filter height="140%" id="glow" width="140%" x="-20%" y="-20%">
                         <fegaussianblur result="blur" stdDeviation="3"></fegaussianblur>
@@ -356,15 +356,15 @@ export default function RouteMapBudgetView({ onNavigate }) {
                       {/* Background Ring */}
                       <circle cx="50" cy="50" fill="none" r="38" stroke="#eff4ff" strokeWidth="12" />
                       {/* Category 1: Stay & Heritage Haveli (37%) -> dasharray = 88.3 238.7 */}
-                      <circle cx="50" cy="50" fill="none" r="38" stroke="#004357" strokeDasharray="88.3 238.7" strokeDashoffset="0" strokeWidth="12" />
+                      <circle cx="50" cy="50" fill="none" r="38" stroke="#EA580C" strokeDasharray="88.3 238.7" strokeDashoffset="0" strokeWidth="12" />
                       {/* Category 2: Workshops & Tickets (25%) -> dasharray = 59.6 238.7 */}
-                      <circle cx="50" cy="50" fill="none" r="38" stroke="#0d5c75" strokeDasharray="59.6 238.7" strokeDashoffset="-88.3" strokeWidth="12" />
+                      <circle cx="50" cy="50" fill="none" r="38" stroke="#C2410C" strokeDasharray="59.6 238.7" strokeDashoffset="-88.3" strokeWidth="12" />
                       {/* Category 3: Dining & Cafes (18%) -> dasharray = 42.9 238.7 */}
-                      <circle cx="50" cy="50" fill="none" r="38" stroke="#006b5f" strokeDasharray="42.9 238.7" strokeDashoffset="-147.9" strokeWidth="12" />
+                      <circle cx="50" cy="50" fill="none" r="38" stroke="#F59E0B" strokeDasharray="42.9 238.7" strokeDashoffset="-147.9" strokeWidth="12" />
                       {/* Category 4: Transit (9%) -> dasharray = 21.5 238.7 */}
-                      <circle cx="50" cy="50" fill="none" r="38" stroke="#3cddc7" strokeDasharray="21.5 238.7" strokeDashoffset="-190.8" strokeWidth="12" />
+                      <circle cx="50" cy="50" fill="none" r="38" stroke="#FED7AA" strokeDasharray="21.5 238.7" strokeDashoffset="-190.8" strokeWidth="12" />
                       {/* Category 5: Unused Buffer (11%) -> dasharray = 26.3 238.7 */}
-                      <circle cx="50" cy="50" fill="none" r="38" stroke="#62fae3" strokeDasharray="26.3 238.7" strokeDashoffset="-212.3" strokeWidth="12" />
+                      <circle cx="50" cy="50" fill="none" r="38" stroke="#FDE68A" strokeDasharray="26.3 238.7" strokeDashoffset="-212.3" strokeWidth="12" />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                       <span className="font-headline-sm text-headline-sm font-bold text-primary">5</span>
@@ -515,17 +515,17 @@ export default function RouteMapBudgetView({ onNavigate }) {
               <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 80">
                 <defs>
                   <lineargradient id="elevationFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#006b5f" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#006b5f" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
                   </lineargradient>
                 </defs>
                 <path d="M 0,60 Q 150,20 300,35 T 600,45 T 850,25 L 1000,55 L 1000,80 L 0,80 Z" fill="url(#elevationFill)" />
-                <path d="M 0,60 Q 150,20 300,35 T 600,45 T 850,25 L 1000,55" fill="none" stroke="#006b5f" strokeWidth="2.5" />
+                <path d="M 0,60 Q 150,20 300,35 T 600,45 T 850,25 L 1000,55" fill="none" stroke="#F59E0B" strokeWidth="2.5" />
                 {/* Checkpoint Marker Lines */}
-                <line stroke="#004357" strokeDasharray="2 2" strokeWidth="1" x1="120" x2="120" y1="10" y2="80" />
-                <line stroke="#004357" strokeDasharray="2 2" strokeWidth="1" x1="380" x2="380" y1="10" y2="80" />
-                <line stroke="#004357" strokeDasharray="2 2" strokeWidth="1" x1="650" x2="650" y1="10" y2="80" />
-                <line stroke="#004357" strokeDasharray="2 2" strokeWidth="1" x1="900" x2="900" y1="10" y2="80" />
+                <line stroke="#EA580C" strokeDasharray="2 2" strokeWidth="1" x1="120" x2="120" y1="10" y2="80" />
+                <line stroke="#EA580C" strokeDasharray="2 2" strokeWidth="1" x1="380" x2="380" y1="10" y2="80" />
+                <line stroke="#EA580C" strokeDasharray="2 2" strokeWidth="1" x1="650" x2="650" y1="10" y2="80" />
+                <line stroke="#EA580C" strokeDasharray="2 2" strokeWidth="1" x1="900" x2="900" y1="10" y2="80" />
               </svg>
               {/* Dynamic Marker Labels */}
               <div className="absolute inset-x-0 bottom-2 flex justify-between px-6 font-label-sm text-label-sm text-on-surface-variant pointer-events-none">
