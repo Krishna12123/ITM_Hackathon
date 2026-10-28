@@ -90,13 +90,6 @@ export default function Navbar({
     { id: 'experiences', label: 'Experiences', icon: Sparkles, action: () => handleNavClick('experiences') },
     { id: 'place-details', label: 'Place Details', icon: MapPin, action: () => handleNavClick('place-details') },
     { id: 'planner', label: 'AI Planner', icon: Calendar, action: () => handleNavClick('planner') },
-    {
-      id: 'itinerary',
-      label: 'Smart Itinerary',
-      icon: Cpu,
-      action: () => handleNavClick('itinerary'),
-      isPrimaryAction: true // Distinctive Orange Highlight
-    },
     { id: 'route_budget', label: 'Route & Budget', icon: Route, action: () => handleNavClick('route_budget') },
     { id: 'contribute', label: 'Share a Gem', icon: PlusCircle, action: () => handleNavClick('contribute') },
   ];
@@ -178,7 +171,7 @@ export default function Navbar({
 
           {/* Compact Tablet-Desktop Nav (1024px to 1279px) */}
           <nav className="hidden lg:flex xl:hidden items-center gap-1 text-xs font-semibold">
-            {primaryNavItems.slice(0, 5).map((item) => {
+            {primaryNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -194,13 +187,6 @@ export default function Navbar({
                 </button>
               );
             })}
-            <button
-              onClick={() => handleNavClick('itinerary')}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F45B0B] text-white font-bold text-xs shadow-xs hover:bg-[#C94708]"
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Itinerary</span>
-            </button>
           </nav>
 
           {/* =============================================================== */}
