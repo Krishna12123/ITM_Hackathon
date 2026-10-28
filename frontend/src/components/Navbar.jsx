@@ -21,7 +21,7 @@ export default function Navbar({ currentView, setCurrentView }) {
             <span className="material-symbols-outlined text-[24px]">terrain</span>
           </div>
           <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">
-            TerraVenture
+            YatraSathi
           </span>
         </div>
 

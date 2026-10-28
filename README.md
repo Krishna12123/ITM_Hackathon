@@ -1,12 +1,12 @@
-# TerraVenture - AI Trip Planner & Smart Itinerary
+# YatraSathi - AI Trip Planner & Smart Itinerary
 
-A modern travel intelligence platform based on the **Google Stitch** TerraVenture trip planner module designs (`/Users/krishnashukla/Desktop/stitch_terraventure_trip_planner_module`).
+A modern travel intelligence platform based on the **Google Stitch** trip planner module designs.
 
 ## 🌟 1:1 Pixel-Exact Stitch Screens
 
 The application reproduces the exact layout, typography, SVG paths, interactive widgets, and classes from the Stitch exports:
 
-1. **`TripPlannerView.jsx`** &larr; `terraventure_ai_trip_planner_desktop/code.html`
+1. **`TripPlannerView.jsx`**
    - Split 12-column layout (7 cols planner form engine + 5 cols live preview dossier canvas)
    - Dynamic budget slider with `handleBudgetChange` logic & dynamic tier badges
    - Interactive explorer stepper (`incrementGuests`, `decrementGuests`)
@@ -14,7 +14,7 @@ The application reproduces the exact layout, typography, SVG paths, interactive 
    - Travel vibes & pacing selectors
    - "Synthesize Expedition Itinerary" CTA
 
-2. **`GeneratingItineraryView.jsx`** &larr; `terraventure_ai_generating_itinerary_desktop/code.html`
+2. **`GeneratingItineraryView.jsx`**
    - Ambient topographical header panel with warm flare blobs
    - Milestone stepper (Curated, Routing, Hours, Pacing)
    - Live simulated ticker (`ticker-text`) cycling through real synthesis checkpoints
@@ -22,7 +22,7 @@ The application reproduces the exact layout, typography, SVG paths, interactive 
    - 5 active engine pipelines execution checklist
    - Spatial nodes and daylight forecast radar
 
-3. **`SmartItineraryView.jsx`** &larr; `terraventure_smart_itinerary_view_desktop/code.html`
+3. **`SmartItineraryView.jsx`**
    - Command header & meta strip (4 Days, 2 Explorers, Comfortable Boutique)
    - Live Budget Tracker (₹14,200 of ₹18,500, 76% utilized, ₹4,300 safety buffer)
    - Day selector pill tabs (Day 1: Old City & Lake Pichola, Day 2: Lakes & Forts, etc.)
@@ -30,7 +30,7 @@ The application reproduces the exact layout, typography, SVG paths, interactive 
    - Timeline stream with rich cards, badges, AI insider advice, and action buttons
    - Companion panels with daylight forecast, aarti timings, and cultural etiquette
 
-4. **`RouteMapBudgetView.jsx`** &larr; `terraventure_route_map_budget_breakdown_desktop/code.html`
+4. **`RouteMapBudgetView.jsx`**
    - Top summary & control deck with elevation gain (142m) and walking pace metrics
    - Interactive SVG map canvas with custom gradient glow trajectory paths and floating numbered pins
    - Stop-by-step route inspector

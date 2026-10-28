@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { submitTripInputs } from '../services/api';
+import { supabase } from '../lib/supabaseClient';
 
 export default function TripPlannerView({ onNavigate }) {
   const [budget, setBudget] = useState(18500);
@@ -103,15 +105,76 @@ export default function TripPlannerView({ onNavigate }) {
     btn.classList.remove('text-on-surface-variant');
   };
 
-  const onGenerate = () => {
+  const onGenerate = async () => {
     const btn = document.getElementById('generate-btn');
     if (!btn) return;
     const originalContent = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Synthesizing Optimal Route...</span>';
+    btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Connecting to Database & Synthesizing...</span>';
+
+    // 1. Gather all active interests and themes
+    const activeInterests = Array.from(document.querySelectorAll('#interest-container .interest-chip.active'))
+      .map(el => el.innerText.trim().replace(/^[a-z0-9_]+\n*/i, '').trim())
+      .filter(Boolean);
+
+    // 2. Gather active spiritual heritage focus
+    const activeSpiritual = Array.from(document.querySelectorAll('#faith-container .interest-chip.active'))
+      .map(el => el.innerText.trim().replace(/^[a-z0-9_]+\n*/i, '').trim())
+      .filter(Boolean);
+
+    // 3. Gather pace selection
+    const activePaceEl = document.querySelector('.pace-btn.bg-surface-container-lowest') || document.querySelector('.pace-btn.text-primary');
+    const activePace = activePaceEl ? activePaceEl.textContent.trim() : 'Balanced';
+
+    // 4. Gather transit selection
+    const activeTransitEl = document.querySelector('.transit-btn.bg-surface-container-lowest');
+    const transitTitle = activeTransitEl ? (activeTransitEl.getAttribute('title') || 'local_taxi') : 'local_taxi';
+
+    // 5. Construct full trip inputs payload
+    const tripPayload = {
+      destination: destination || 'Udaipur, Rajasthan, India',
+      start_date: 'Oct 14',
+      end_date: 'Oct 18',
+      days: 4,
+      nights: 3,
+      guests: guestCount,
+      spend_per_person: budget,
+      total_budget: budget * guestCount,
+      budget_tier: budget < 10000 ? 'Backpacker Smart' : budget < 32000 ? 'Comfortable Boutique' : 'Heritage Luxury',
+      budget_breakdown: {
+        stay_pct: 42.0,
+        experiences_pct: 34.0,
+        dining_transit_pct: 24.0
+      },
+      interests: activeInterests.length > 0 ? activeInterests : ['Heritage & Forts', 'Culinary Trails', 'Art & Workshops'],
+      spiritual_traditions: activeSpiritual.length > 0 ? activeSpiritual : ['Jain Pilgrimage & Architecture'],
+      pacing: activePace,
+      transit_mode: transitTitle
+    };
+
+    // Cache locally for instant UI state
+    try {
+      localStorage.setItem('active_trip_inputs', JSON.stringify(tripPayload));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    // Submit to FastAPI backend (which runs retry loop to Supabase)
+    submitTripInputs(tripPayload).catch(err => console.warn('Backend sync:', err));
+
+    // Also attempt direct client Supabase insert if table is created
+    try {
+      supabase.from('trip_inputs').insert(tripPayload).then(({ data, error }) => {
+        if (error) console.info('Supabase client insert note:', error.message);
+        else console.log('Successfully recorded to Supabase:', data);
+      });
+    } catch (e) {
+      console.info('Supabase client pending:', e);
+    }
+
     setTimeout(() => {
       if (onNavigate) onNavigate('generating');
-    }, 1000);
+    }, 900);
   };
 
   return (
@@ -411,7 +474,7 @@ All Spiritual Traditions / Secular                    </button>
                 </div>
                 {/* Topographic & Itinerary Feature Highlights */}
                 <div className="space-y-3">
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">TerraVenture Engine Inclusions</span>
+                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">YatraSathi Engine Inclusions</span>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3 font-body-sm text-body-sm">
                       <div className="w-6 h-6 rounded-md bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0 mt-0.5">

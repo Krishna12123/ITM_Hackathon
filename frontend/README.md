@@ -1,6 +1,6 @@
-# TerraVenture Frontend (React.js + Tailwind CSS)
+# YatraSathi Frontend (React.js + Tailwind CSS)
 
-Built with **React.js (JavaScript JSX)** and styled with **Tailwind CSS**, replicating the design and workflow of the Stitch TerraVenture Trip Planner module.
+Built with **React.js (JavaScript JSX)** and styled with **Tailwind CSS**, replicating the design and workflow of the YatraSathi Trip Planner module.
 
 ## Available Views & Components
 
