@@ -1,6 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function SmartItineraryView({ onNavigate }) {
+  const [activePlan] = useState(() => {
+    try {
+      const raw = localStorage.getItem('generated_smart_itinerary');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const destinationName = activePlan?.destination || 'Udaipur, Rajasthan, India';
+  const durationDays = activePlan?.duration_days || 4;
+  const travelersCount = activePlan?.travelers || 2;
+  const paceName = activePlan?.travel_pace || 'Balanced';
+  const transitName = activePlan?.transit_mode || 'Auto / Walk';
+  const totalBudget = activePlan?.budget_ledger?.total_budget || 37000;
+  const perPersonSpend = activePlan?.budget_ledger?.per_person_spend || 18500;
+  const activeDays = activePlan?.itinerary_days || [];
   return (
   <main className="w-full pt-20 bg-surface min-h-[calc(100vh-16rem)]">
     <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8">
@@ -22,31 +39,27 @@ export default function SmartItineraryView({ onNavigate }) {
                           </span>
                 <span className="text-outline font-label-md text-label-md">• Updated 12m ago</span>
               </div>
-              <h1 className="font-headline-xl text-headline-xl text-clinical-navy tracking-tight">Udaipur Royal Heritage & Sunset Trails</h1>
+              <h1 className="font-headline-xl text-headline-xl text-clinical-navy tracking-tight">{destinationName}</h1>
               <div className="flex flex-wrap items-center gap-4 text-on-surface-variant font-body-sm text-body-sm">
                 <div className="flex items-center gap-1.5 font-medium">
                   <span className="material-symbols-outlined text-[18px] text-outline">calendar_month</span>
-
-            Oct 14 – 18 · 4 Days
-                          </div>
+                  <span>{durationDays} Days Expedited</span>
+                </div>
                 <div className="w-1 h-1 rounded-full bg-outline-variant"></div>
                 <div className="flex items-center gap-1.5 font-medium">
                   <span className="material-symbols-outlined text-[18px] text-outline">group</span>
-
-            2 Travelers
-                          </div>
+                  <span>{travelersCount} Explorers</span>
+                </div>
                 <div className="w-1 h-1 rounded-full bg-outline-variant"></div>
                 <div className="flex items-center gap-1.5 font-medium">
                   <span className="material-symbols-outlined text-[18px] text-secondary">speed</span>
-
-            Pace: Balanced
-                          </div>
+                  <span>Pace: {paceName}</span>
+                </div>
                 <div className="w-1 h-1 rounded-full bg-outline-variant"></div>
                 <div className="flex items-center gap-1.5 font-medium">
                   <span className="material-symbols-outlined text-[18px] text-outline">directions_walk</span>
-
-            Auto / Walk
-                          </div>
+                  <span>{transitName}</span>
+                </div>
               </div>
             </div>
             {/* Real-Time Budget Tracker Widget */}

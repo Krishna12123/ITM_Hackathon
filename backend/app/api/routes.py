@@ -36,7 +36,8 @@ def make_prediction(request: PredictionRequest):
 def generate_itinerary(request: ItineraryRequest):
     """
     Intelligent itinerary synthesis endpoint for YatraSathi Trip Planner.
-    Calculates dynamic budget breakdowns based on duration, guests, and spend tier.
+    Executes the complete ML/AI pipeline:
+    Gemini -> Sentence Transformers -> Google OR-Tools -> Route & Budget Ledger.
     """
     total = request.total_budget if request.total_budget else (request.spend_per_person * request.guests if request.spend_per_person else request.budget)
     
@@ -49,13 +50,31 @@ def generate_itinerary(request: ItineraryRequest):
         "experiences": round(total * 0.14, 2)
     }
 
+    # Execute ML pipeline
+    ml_result = ml_service.generate_smart_itinerary({
+        "destination": request.destination,
+        "duration_days": request.days,
+        "travelers": request.guests,
+        "budget_per_person": request.spend_per_person or (total / request.guests),
+        "budget_allocation": request.budget_breakdown or {"stay": 42, "experiences": 34, "dining_transit": 24},
+        "interests": request.interests,
+        "spiritual_preferences": request.spiritual_traditions or [],
+        "travel_pace": request.pacing or "balanced",
+        "transit_mode": request.transit_mode or "auto_walk"
+    })
+
     return {
         "destination": request.destination,
         "days": request.days,
         "guests": request.guests,
         "total_budget": total,
         "budget_breakdown": breakdown,
-        "status": "success"
+        "status": "success",
+        "destination_intelligence": ml_result.get("destination_intelligence"),
+        "budget_ledger": ml_result.get("budget_ledger"),
+        "itinerary_days": ml_result.get("itinerary_days"),
+        "map_waypoints": ml_result.get("map_waypoints"),
+        "ml_model_metadata": ml_result.get("ml_model_metadata")
     }
 
 @router.post("/trips/submit", response_model=TripInputResponse)

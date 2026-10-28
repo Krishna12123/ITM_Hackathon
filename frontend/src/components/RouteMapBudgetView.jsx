@@ -1,6 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function RouteMapBudgetView({ onNavigate }) {
+  const [activePlan] = useState(() => {
+    try {
+      const raw = localStorage.getItem('generated_smart_itinerary');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const destinationName = activePlan?.destination || 'Udaipur, Rajasthan';
+  const totalBudget = activePlan?.budget_ledger?.total_budget || 37000;
+  const perPersonSpend = activePlan?.budget_ledger?.per_person_spend || 18500;
+  const stayAmount = activePlan?.budget_ledger?.stay_allocation?.target_amount || 15540;
+  const expAmount = activePlan?.budget_ledger?.experiences_allocation?.target_amount || 12580;
+  const diningAmount = activePlan?.budget_ledger?.dining_transit_allocation?.target_amount || 8880;
+  const bufferAmount = activePlan?.budget_ledger?.safety_buffer_retained || 4300;
+
   useEffect(() => {
     const dayTabs = document.querySelectorAll('#dayTabs button');
     dayTabs.forEach(button => {

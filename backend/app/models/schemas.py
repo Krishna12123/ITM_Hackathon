@@ -81,3 +81,8 @@ class ItineraryResponse(BaseModel):
     total_budget: float
     budget_breakdown: Dict[str, float]
     status: str = "success"
+    destination_intelligence: Optional[Dict[str, Any]] = None
+    budget_ledger: Optional[Dict[str, Any]] = None
+    itinerary_days: Optional[List[Dict[str, Any]]] = None
+    map_waypoints: Optional[List[Dict[str, Any]]] = None
+    ml_model_metadata: Optional[Dict[str, Any]] = None
