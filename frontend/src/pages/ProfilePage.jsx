@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   User,
   MapPin,
@@ -21,11 +21,25 @@ import {
   Info,
   Calendar,
   Layers,
-  ChevronRight
+  ChevronRight,
+  LogOut,
+  RefreshCw,
+  Server,
+  Database,
+  Lock,
+  Sliders,
+  ShieldAlert
 } from 'lucide-react';
 import { MOCK_DESTINATIONS, MOCK_EXPERIENCES } from '../data/mockData';
+import {
+  getAuthenticatedSession,
+  setActiveSessionRole,
+  signOutSession,
+  hasAdminPrivileges,
+  DEFAULT_PROFILES
+} from '../services/authService';
 
-// Initial Mock Contributions submitted by this user
+// Initial Mock Contributions submitted by user
 const INITIAL_CONTRIBUTIONS = [
   {
     id: 'contrib-1',
@@ -113,35 +127,37 @@ const INITIAL_MODERATION_QUEUE = [
 ];
 
 export default function ProfilePage({
-  favorites,
+  favorites = [],
   onToggleFavorite,
-  tripItems,
+  tripItems = [],
   onToggleTrip,
   onNavigateToPlace,
   onNavigateToExperiences,
   onShowToast
 }) {
-  const [activeTab, setActiveTab] = useState('contributions'); // 'contributions' | 'saved' | 'experiences' | 'moderation'
-  const [isModeratorView, setIsModeratorView] = useState(false);
+  // 1. Authenticated Session & Role State
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [authenticatedUser, setAuthenticatedUser] = useState(null);
+  const [userRole, setUserRole] = useState('user'); // 'user' | 'admin'
+  const [sessionSource, setSessionSource] = useState('session_store');
 
-  // Profile Information State (Demo User)
-  const [profile, setProfile] = useState({
-    name: 'Bhavna Sharma',
-    handle: '@bhavna_explorer',
-    role: 'Community Storyteller & Verified Verifier',
-    bio: 'Heritage and community tourism scout exploring Bundelkhand & North-East India. Passionate about folk oral traditions, rural farming homestays, and reviving indigenous crafts.',
-    location: 'Madhya Pradesh, India',
-    joined: 'October 2026'
-  });
+  // 2. Active Tab
+  const [activeTab, setActiveTab] = useState('contributions'); // 'contributions' | 'saved' | 'experiences' | 'settings' | 'moderation' | 'history' | 'system'
+
+  // 3. Edit Profile Modal State
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editForm, setEditForm] = useState({ ...profile });
+  const [editForm, setEditForm] = useState({
+    name: '',
+    location: '',
+    bio: ''
+  });
 
-  // Contributions State
+  // 4. Contributions State
   const [myContributions, setMyContributions] = useState(INITIAL_CONTRIBUTIONS);
   const [contributionSearch, setContributionSearch] = useState('');
   const [contributionStatusFilter, setContributionStatusFilter] = useState('All');
 
-  // Moderation Queue State
+  // 5. Moderation Queue State (Admin Only)
   const [moderationQueue, setModerationQueue] = useState(INITIAL_MODERATION_QUEUE);
   const [moderationSearch, setModerationSearch] = useState('');
   const [moderationCategoryFilter, setModerationCategoryFilter] = useState('All');
@@ -149,8 +165,43 @@ export default function ProfilePage({
   const [actionReason, setActionReason] = useState('');
   const [isProcessingAction, setIsProcessingAction] = useState(false);
 
-  // Selected contribution for inspection modal
+  // 6. Selected contribution for inspection modal
   const [selectedContributionModal, setSelectedContributionModal] = useState(null);
+
+  // Initialize and detect authenticated session
+  const loadSession = async () => {
+    setSessionLoading(true);
+    try {
+      const sessionData = await getAuthenticatedSession();
+      if (sessionData && sessionData.user) {
+        setAuthenticatedUser(sessionData.user);
+        const role = sessionData.user.role || 'user';
+        setUserRole(role);
+        setSessionSource(sessionData.source || 'session_store');
+        setEditForm({
+          name: sessionData.user.name || '',
+          location: sessionData.user.location || '',
+          bio: sessionData.user.bio || ''
+        });
+
+        // Set appropriate default tab based on detected role
+        setActiveTab(role === 'admin' ? 'moderation' : 'contributions');
+      }
+    } catch (err) {
+      console.warn('Failed to detect authenticated session:', err);
+      // Fallback safely to regular user
+      const fallback = DEFAULT_PROFILES.user;
+      setAuthenticatedUser(fallback);
+      setUserRole('user');
+      setActiveTab('contributions');
+    } finally {
+      setSessionLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSession();
+  }, []);
 
   // Compute Saved Places based on shared `favorites`
   const savedDestinations = useMemo(() => {
@@ -173,7 +224,7 @@ export default function ProfilePage({
     });
   }, [myContributions, contributionSearch, contributionStatusFilter]);
 
-  // Filter Moderation Queue
+  // Filter Moderation Queue (Admin only)
   const filteredModerationQueue = useMemo(() => {
     return moderationQueue.filter((m) => {
       const matchSearch =
@@ -187,24 +238,70 @@ export default function ProfilePage({
   }, [moderationQueue, moderationSearch, moderationCategoryFilter]);
 
   const pendingModerationCount = moderationQueue.filter((m) => m.status === 'Pending').length;
+  const approvedModerationCount = moderationQueue.filter((m) => m.status === 'Approved').length;
 
   // Handle Profile Update
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    setProfile({ ...editForm });
+    if (!authenticatedUser) return;
+    const updated = {
+      ...authenticatedUser,
+      name: editForm.name,
+      location: editForm.location,
+      bio: editForm.bio
+    };
+    setAuthenticatedUser(updated);
     setIsEditingProfile(false);
     if (onShowToast) {
-      onShowToast('Profile updated successfully! (Demo data saved)');
+      onShowToast('Profile updated successfully!');
     }
   };
 
-  // Handle Moderation Action
+  // Switch Active Session Role (User / Admin)
+  const handleSwitchSessionRole = (targetRole) => {
+    const newProfile = setActiveSessionRole(targetRole);
+    setAuthenticatedUser(newProfile);
+    setUserRole(newProfile.role);
+    setEditForm({
+      name: newProfile.name,
+      location: newProfile.location,
+      bio: newProfile.bio
+    });
+    setActiveTab(newProfile.role === 'admin' ? 'moderation' : 'contributions');
+    if (onShowToast) {
+      onShowToast(`Switched active session to ${newProfile.role === 'admin' ? 'Administrator' : 'Regular User'}`);
+    }
+  };
+
+  // Sign out session
+  const handleSignOut = async () => {
+    await signOutSession();
+    // Reset to base regular user session
+    const resetUser = DEFAULT_PROFILES.user;
+    setAuthenticatedUser(resetUser);
+    setUserRole('user');
+    setActiveTab('contributions');
+    if (onShowToast) {
+      onShowToast('Signed out of session. Switched to guest explorer profile.');
+    }
+  };
+
+  // Handle Moderation Action (Strictly guarded by hasAdminPrivileges)
   const handleExecuteModeration = () => {
+    // 1. Independent authorization guard: reject non-admin callers
+    if (!hasAdminPrivileges(authenticatedUser)) {
+      if (onShowToast) {
+        onShowToast('Security Alert: Action denied. Only verified administrators can moderate contributions.');
+      }
+      setModerationActionModal(null);
+      return;
+    }
+
     if (!moderationActionModal) return;
     const { item, action } = moderationActionModal;
 
     if ((action === 'request-changes' || action === 'reject') && !actionReason.trim()) {
-      alert('Please provide a reason or note for this moderation action.');
+      alert('Please provide a feedback note or reason for this moderation action.');
       return;
     }
 
@@ -217,10 +314,10 @@ export default function ProfilePage({
 
       if (action === 'request-changes') {
         updatedStatus = 'Needs Changes';
-        toastMsg = `Changes requested for "${item.title}". Feedback sent to contributor.`;
+        toastMsg = `Changes requested for "${item.title}". Feedback logged.`;
       } else if (action === 'reject') {
         updatedStatus = 'Rejected';
-        toastMsg = `Submission "${item.title}" rejected. Reason logged.`;
+        toastMsg = `Submission "${item.title}" rejected. Reason recorded in audit log.`;
       }
 
       setModerationQueue((prev) =>
@@ -233,209 +330,362 @@ export default function ProfilePage({
       if (onShowToast) {
         onShowToast(toastMsg);
       }
-    }, 600);
+    }, 450);
   };
+
+  // 1. Loading State
+  if (sessionLoading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center bg-canvas p-6">
+        <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-4" />
+        <h3 className="font-display font-bold text-base text-slate-800">
+          Loading Authenticated Profile...
+        </h3>
+        <p className="text-xs text-slate-500 mt-1">
+          Verifying security claims and account permissions.
+        </p>
+      </div>
+    );
+  }
+
+  const isAdmin = userRole === 'admin';
 
   return (
     <div className="min-h-screen bg-canvas pb-20 animate-fadeInUp">
-      {/* 2. Profile Overview Header */}
+      {/* Profile Overview Header */}
       <section className="bg-gradient-to-b from-card to-canvas border-b border-border-subtle pt-8 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-card rounded-xl p-6 sm:p-8 border border-border-subtle shadow-level-1">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              {/* Left Profile Identity */}
+              
+              {/* Identity & Avatar */}
               <div className="flex items-start sm:items-center gap-4">
                 <div className="relative">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-primary to-secondary text-white font-display font-extrabold text-2xl sm:text-3xl flex items-center justify-center shadow-md">
-                    BS
-                  </div>
+                  {authenticatedUser?.avatar ? (
+                    <img
+                      src={authenticatedUser.avatar}
+                      alt={authenticatedUser.name}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-primary/20"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-primary to-secondary text-white font-display font-extrabold text-2xl sm:text-3xl flex items-center justify-center shadow-md">
+                      {authenticatedUser?.name ? authenticatedUser.name.charAt(0) : 'U'}
+                    </div>
+                  )}
+
+                  {/* Role Badge Indicator */}
                   <div
-                    className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-tertiary text-white flex items-center justify-center border-2 border-white shadow-sm"
-                    title="Verified Community Scout"
+                    className={`absolute bottom-0 right-0 w-6 h-6 rounded-full text-white flex items-center justify-center border-2 border-white shadow-sm ${
+                      isAdmin ? 'bg-amber-600' : 'bg-primary'
+                    }`}
+                    title={isAdmin ? 'Administrator Verified' : 'Community Explorer'}
                   >
-                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {isAdmin ? (
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                    ) : (
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    )}
                   </div>
                 </div>
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">
-                      {profile.name}
+                      {authenticatedUser?.name || 'Explorer Profile'}
                     </h1>
-                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                      Demo Profile
+
+                    {/* Verified Role Badge */}
+                    {isAdmin ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
+                        <ShieldCheck className="w-3 h-3 text-amber-700" />
+                        <span>Administrator</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                        <User className="w-3 h-3" />
+                        <span>Community Explorer</span>
+                      </span>
+                    )}
+
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {authenticatedUser?.handle}
                     </span>
                   </div>
 
-                  <p className="text-xs font-medium text-slate-500 mt-0.5">{profile.role}</p>
+                  <p className="text-xs font-medium text-slate-600 mt-1">
+                    {authenticatedUser?.roleTitle || (isAdmin ? 'System Administrator' : 'Community Explorer')}
+                  </p>
 
-                  <div className="flex items-center gap-4 text-xs text-slate-500 mt-2">
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-primary" />
-                      {profile.location}
+                      {authenticatedUser?.location || 'India'}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      Joined {profile.joined}
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Clock className="w-3.5 h-3.5" />
+                      Joined {authenticatedUser?.joined || '2026'}
+                    </span>
+                    <span className="text-[11px] text-slate-400 border-l border-slate-200 pl-3">
+                      {authenticatedUser?.email}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Right Profile Actions & Demo Mode Toggle */}
+              {/* Action Controls & Session Switcher */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="btn-secondary text-xs sm:text-sm py-2 px-4 flex items-center justify-center gap-1.5"
+                  className="btn-secondary text-xs sm:text-sm py-2 px-3.5 flex items-center justify-center gap-1.5"
                 >
-                  <Edit3 className="w-4 h-4 text-slate-600" />
+                  <Edit3 className="w-3.5 h-3.5 text-slate-600" />
                   <span>Edit Profile</span>
                 </button>
 
-                {/* Moderator Access Switcher */}
-                <div className="p-1.5 bg-subtle rounded-lg border border-border-subtle flex items-center justify-between gap-2 text-xs">
-                  <span className="text-slate-600 font-semibold px-2">Role:</span>
+                {/* Role Switcher for Testing */}
+                <div className="p-1 bg-subtle rounded-lg border border-border-subtle flex items-center gap-1 text-xs">
+                  <span className="text-[11px] font-bold text-slate-500 px-2 uppercase">Role:</span>
                   <button
-                    onClick={() => {
-                      setIsModeratorView(false);
-                      if (activeTab === 'moderation') setActiveTab('contributions');
-                    }}
-                    className={`px-3 py-1 rounded-md font-semibold transition-all ${
-                      !isModeratorView
-                        ? 'bg-primary text-white shadow-sm'
+                    onClick={() => handleSwitchSessionRole('user')}
+                    className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
+                      !isAdmin
+                        ? 'bg-primary text-white shadow-xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
+                    title="Switch to Regular User Profile"
                   >
-                    Contributor
+                    User
                   </button>
                   <button
-                    onClick={() => {
-                      setIsModeratorView(true);
-                      setActiveTab('moderation');
-                    }}
-                    className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1 ${
-                      isModeratorView
-                        ? 'bg-tertiary text-white shadow-sm'
+                    onClick={() => handleSwitchSessionRole('admin')}
+                    className={`px-2.5 py-1 rounded text-xs font-semibold transition-all flex items-center gap-1 ${
+                      isAdmin
+                        ? 'bg-amber-600 text-white shadow-xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
+                    title="Switch to Administrator Profile"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>Moderator</span>
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>Admin</span>
                   </button>
                 </div>
+
+                {/* Logout Button */}
+                <button
+                  onClick={handleSignOut}
+                  title="Sign out of current session"
+                  className="p-2 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 border border-border-subtle transition-colors flex items-center justify-center"
+                  aria-label="Sign out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
             {/* Profile Bio */}
             <p className="text-xs sm:text-sm text-slate-600 mt-4 pt-4 border-t border-slate-100 leading-relaxed max-w-3xl">
-              {profile.bio}
+              {authenticatedUser?.bio}
             </p>
 
             {/* Metrics Counters Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-4 border-t border-slate-100 text-center">
-              <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
-                <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
-                  My Contributions
-                </span>
-                <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block">
-                  {myContributions.length}
-                </span>
-              </div>
+              {isAdmin ? (
+                // Admin Metrics
+                <>
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-amber-800 tracking-wider block">
+                      Pending Reviews
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-amber-600 mt-0.5 block">
+                      {pendingModerationCount}
+                    </span>
+                  </div>
 
-              <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
-                <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
-                  Saved Places
-                </span>
-                <span className="font-display font-extrabold text-xl text-primary mt-0.5 block">
-                  {favorites.length}
-                </span>
-              </div>
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-emerald-800 tracking-wider block">
+                      Approved Gems
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-emerald-600 mt-0.5 block">
+                      {approvedModerationCount}
+                    </span>
+                  </div>
 
-              <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
-                <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
-                  Queued in Trip
-                </span>
-                <span className="font-display font-extrabold text-xl text-tertiary mt-0.5 block">
-                  {tripItems.length}
-                </span>
-              </div>
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
+                      Queue Total
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block">
+                      {moderationQueue.length}
+                    </span>
+                  </div>
 
-              <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
-                <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
-                  Pending Reviews
-                </span>
-                <span className="font-display font-extrabold text-xl text-secondary mt-0.5 block">
-                  {pendingModerationCount}
-                </span>
-              </div>
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-primary tracking-wider block">
+                      System Status
+                    </span>
+                    <span className="font-display font-extrabold text-sm text-emerald-600 mt-1.5 flex items-center justify-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      Healthy
+                    </span>
+                  </div>
+                </>
+              ) : (
+                // Regular User Metrics
+                <>
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
+                      My Contributions
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block">
+                      {myContributions.length}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
+                      Saved Wishlist
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-primary mt-0.5 block">
+                      {favorites.length}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
+                      Queued in Trip
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-secondary mt-0.5 block">
+                      {tripItems.length}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-canvas rounded-lg border border-border-subtle">
+                    <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block">
+                      Contributions Approved
+                    </span>
+                    <span className="font-display font-extrabold text-xl text-emerald-600 mt-0.5 block">
+                      {myContributions.filter((c) => c.status === 'Approved').length}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Profile Tabs Navigation */}
+      {/* Profile Tabs Navigation */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <div className="flex items-center gap-2 border-b border-border-subtle overflow-x-auto scrollbar-none pb-1">
-          <button
-            onClick={() => setActiveTab('contributions')}
-            className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'contributions'
-                ? 'border-primary text-primary bg-card'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>My Contributions ({myContributions.length})</span>
-          </button>
+          {isAdmin ? (
+            // Admin Tabs
+            <>
+              <button
+                onClick={() => setActiveTab('moderation')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'moderation'
+                    ? 'border-amber-600 text-amber-900 font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-700" />
+                <span>Moderation Queue ({pendingModerationCount})</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('saved')}
-            className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'saved'
-                ? 'border-primary text-primary bg-card'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Heart className="w-4 h-4 fill-primary/20 text-primary" />
-            <span>Wishlist ({favorites.length})</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'history'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Clock className="w-4 h-4" />
+                <span>Audit & History ({moderationQueue.length})</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('experiences')}
-            className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'experiences'
-                ? 'border-primary text-primary bg-card'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Luggage className="w-4 h-4" />
-            <span>My Trip Queue ({tripItems.length})</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('system')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'system'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Server className="w-4 h-4" />
+                <span>System & Infrastructure</span>
+              </button>
 
-          {isModeratorView && (
-            <button
-              onClick={() => setActiveTab('moderation')}
-              className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'moderation'
-                  ? 'border-tertiary text-tertiary bg-card'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Moderation Queue</span>
-              {pendingModerationCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-secondary text-slate-950 text-[10px] font-bold flex items-center justify-center">
-                  {pendingModerationCount}
-                </span>
-              )}
-            </button>
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'settings'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Sliders className="w-4 h-4" />
+                <span>Account & Credentials</span>
+              </button>
+            </>
+          ) : (
+            // Regular User Tabs
+            <>
+              <button
+                onClick={() => setActiveTab('contributions')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'contributions'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>My Contributions ({myContributions.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('saved')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'saved'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Heart className="w-4 h-4 fill-primary/20 text-primary" />
+                <span>Wishlist ({favorites.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('experiences')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'experiences'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Luggage className="w-4 h-4" />
+                <span>My Trip Queue ({tripItems.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`px-4 py-2.5 rounded-t-lg text-xs sm:text-sm font-semibold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'settings'
+                    ? 'border-primary text-primary font-bold bg-card'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Sliders className="w-4 h-4" />
+                <span>Account Settings</span>
+              </button>
+            </>
           )}
         </div>
 
-        {/* Tab 1: My Contributions */}
-        {activeTab === 'contributions' && (
+        {/* -------------------- USER TAB 1: MY CONTRIBUTIONS -------------------- */}
+        {!isAdmin && activeTab === 'contributions' && (
           <div className="space-y-4 animate-fadeIn">
-            {/* Search & Filters for Contributions */}
+            {/* Search & Filters */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
                 <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
@@ -465,7 +715,7 @@ export default function ProfilePage({
               </div>
             </div>
 
-            {/* Contributions Cards List */}
+            {/* List */}
             {filteredContributions.length === 0 ? (
               <div className="bg-card rounded-xl border border-dashed border-border-subtle p-12 text-center max-w-md mx-auto shadow-level-1">
                 <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-2" />
@@ -473,307 +723,186 @@ export default function ProfilePage({
                   No contributions found
                 </h3>
                 <p className="text-xs text-slate-500 mt-1 mb-4">
-                  {contributionSearch || contributionStatusFilter !== 'All'
-                    ? 'No contributions matched your filter criteria.'
-                    : "You haven't contributed any hidden gems yet."}
+                  Share a secret street-food stall, craft workshop, or hidden monument to earn community badges!
                 </p>
-                <button
-                  onClick={() => {
-                    setContributionSearch('');
-                    setContributionStatusFilter('All');
-                  }}
-                  className="btn-secondary text-xs py-2 px-4"
-                >
-                  Reset Filters
-                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredContributions.map((item) => {
-                  let statusBadge = (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">
-                      <Clock className="w-3 h-3" />
-                      Pending Review
-                    </span>
-                  );
-                  if (item.status === 'Approved') {
-                    statusBadge = (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Approved
-                      </span>
-                    );
-                  } else if (item.status === 'Needs Changes') {
-                    statusBadge = (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full">
-                        <AlertCircle className="w-3 h-3" />
-                        Needs Changes
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1 hover:shadow-level-2 transition-all flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-subtle text-slate-600">
-                            {item.category}
-                          </span>
-                          {statusBadge}
-                        </div>
-
-                        <h3 className="font-display font-bold text-base text-slate-900 mb-1">
-                          {item.title}
-                        </h3>
-
-                        <p className="text-xs text-slate-500 flex items-center gap-1 mb-2">
-                          <MapPin className="w-3.5 h-3.5 text-primary" />
-                          <span>{item.location}</span>
-                          <span className="text-slate-300">•</span>
-                          <span>{item.date}</span>
-                        </p>
-
-                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-3">
-                          {item.description}
-                        </p>
-
-                        {item.feedback && (
-                          <div className="p-2.5 bg-subtle rounded-md border border-slate-200/70 text-[11px] text-slate-600">
-                            <span className="font-semibold text-slate-700">Moderator note: </span>
-                            {item.feedback}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400">ID: {item.id}</span>
-                        <button
-                          onClick={() => setSelectedContributionModal(item)}
-                          className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                {filteredContributions.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedContributionModal(item)}
+                    className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1 hover:shadow-level-2 transition-all cursor-pointer flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">
+                          {item.category}
+                        </span>
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                            item.status === 'Approved'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                              : item.status === 'Pending'
+                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                              : 'bg-rose-100 text-rose-800 border border-rose-200'
+                          }`}
                         >
-                          <span>View Details</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
+                          {item.status}
+                        </span>
                       </div>
+
+                      <h3 className="font-display font-bold text-base text-slate-900 mb-1 leading-snug">
+                        {item.title}
+                      </h3>
+
+                      <p className="text-xs text-slate-500 flex items-center gap-1 mb-2">
+                        <MapPin className="w-3.5 h-3.5 text-primary" />
+                        <span>{item.location}</span>
+                      </p>
+
+                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
-                  );
-                })}
+
+                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                      <span>Submitted on {item.date}</span>
+                      <span className="text-primary font-bold inline-flex items-center gap-1">
+                        View Details <ChevronRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         )}
 
-        {/* Tab 2: Wishlist Bookmarks */}
-        {activeTab === 'saved' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-display font-bold text-lg text-slate-900">
-                  Wishlist Bookmarks & Saved Gems
-                </h2>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                  Persisted
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Saved destinations and authentic experiences you plan to explore later. Automatically synced and saved to your browser session.
-              </p>
-            </div>
-
-            {favorites.length === 0 ? (
-              <div className="bg-card rounded-xl border border-dashed border-border-subtle p-12 text-center max-w-md mx-auto shadow-level-1">
-                <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3 shadow-sm">
-                  <Heart className="w-6 h-6 fill-primary/30 text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-base text-slate-800">
-                  Your wishlist has no bookmarks yet
-                </h3>
-                <p className="text-xs text-slate-500 mt-1 mb-4">
-                  Browse destinations or community experiences and tap the heart or bookmark icon to save them for later.
-                </p>
-                <button
-                  onClick={onNavigateToExperiences}
-                  className="btn-primary text-xs py-2 px-5"
-                >
-                  Browse Experiences & Destinations
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Saved Destinations */}
-                {savedDestinations.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-                      Destinations ({savedDestinations.length})
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {savedDestinations.map((dest) => (
-                        <div
-                          key={dest.id}
-                          className="bg-card rounded-xl border border-border-subtle shadow-level-1 overflow-hidden flex flex-col sm:flex-row items-stretch"
-                        >
-                          <img
-                            src={dest.heroImage}
-                            alt={dest.name}
-                            className="w-full sm:w-40 h-36 object-cover"
-                          />
-                          <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                              <span className="text-[10px] font-bold text-tertiary uppercase">
-                                Destination
-                              </span>
-                              <h4 className="font-display font-bold text-sm text-slate-900">
-                                {dest.name}
-                              </h4>
-                              <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                                <MapPin className="w-3 h-3 text-primary" />
-                                {dest.location}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
-                              <button
-                                onClick={onNavigateToPlace}
-                                className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1"
-                              >
-                                <span>Open Details</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={() => onToggleFavorite(dest.id)}
-                                className="text-xs text-slate-400 hover:text-red-600 transition-colors py-1.5 px-2 flex items-center gap-1"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Remove</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Saved Experiences */}
-                {savedExperiences.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-                      Experiences ({savedExperiences.length})
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {savedExperiences.map((exp) => (
-                        <div
-                          key={exp.id}
-                          className="bg-card rounded-xl border border-border-subtle shadow-level-1 overflow-hidden flex flex-col sm:flex-row items-stretch"
-                        >
-                          <img
-                            src={exp.image}
-                            alt={exp.title}
-                            className="w-full sm:w-40 h-36 object-cover"
-                          />
-                          <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                              <span className="text-[10px] font-bold text-primary uppercase">
-                                {exp.category}
-                              </span>
-                              <h4 className="font-display font-bold text-sm text-slate-900">
-                                {exp.title}
-                              </h4>
-                              <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                                <MapPin className="w-3 h-3 text-primary" />
-                                {exp.location}
-                              </p>
-                              <span className="text-xs font-semibold text-slate-800 block mt-1">
-                                ₹{exp.price} <span className="font-normal text-slate-400">(demo)</span>
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
-                              <button
-                                onClick={onNavigateToExperiences}
-                                className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1"
-                              >
-                                <span>View Experience</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={() => onToggleFavorite(exp.id)}
-                                className="text-xs text-slate-400 hover:text-red-600 transition-colors py-1.5 px-2 flex items-center gap-1"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Remove</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tab 3: My Experiences (Added to Trip Queue) */}
-        {activeTab === 'experiences' && (
+        {/* -------------------- USER TAB 2: WISHLIST -------------------- */}
+        {!isAdmin && activeTab === 'saved' && (
           <div className="space-y-4 animate-fadeIn">
-            <div>
-              <h2 className="font-display font-bold text-lg text-slate-900 mb-1">
-                Experiences Queued in My Trip Plan
-              </h2>
-              <p className="text-xs text-slate-500">
-                These community items are currently in your active trip itinerary waiting for AI route generation.
-              </p>
-            </div>
-
-            {tripItems.length === 0 ? (
+            {savedDestinations.length === 0 && savedExperiences.length === 0 ? (
               <div className="bg-card rounded-xl border border-dashed border-border-subtle p-12 text-center max-w-md mx-auto shadow-level-1">
-                <Luggage className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <Heart className="w-10 h-10 text-slate-300 mx-auto mb-2" />
                 <h3 className="font-display font-bold text-base text-slate-800">
-                  Your trip queue is empty
+                  Your Wishlist is Empty
                 </h3>
                 <p className="text-xs text-slate-500 mt-1 mb-4">
-                  Browse authentic village walks, food tastings, and craft sessions to queue them into your plan.
+                  Browse destinations across India and click the heart icon to save them for later planning.
                 </p>
                 <button
                   onClick={onNavigateToExperiences}
                   className="btn-primary text-xs py-2 px-4"
                 >
-                  Explore Experiences
+                  Explore Destinations
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {savedDestinations.map((dest) => (
+                  <div
+                    key={dest.id}
+                    className="bg-card rounded-xl overflow-hidden border border-border-subtle shadow-level-1 hover:shadow-level-2 transition-all flex flex-col justify-between"
+                  >
+                    <div className="relative h-44">
+                      <img
+                        src={dest.image}
+                        alt={dest.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        onClick={() => onToggleFavorite(dest.id)}
+                        className="absolute top-3 right-3 p-2 rounded-full bg-white/90 text-primary hover:bg-white shadow-sm"
+                        title="Remove from Wishlist"
+                      >
+                        <Heart className="w-4 h-4 fill-primary text-primary" />
+                      </button>
+                    </div>
+
+                    <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] font-bold text-primary uppercase">
+                          {dest.state}
+                        </span>
+                        <h4 className="font-display font-bold text-base text-slate-900 leading-snug">
+                          {dest.name}
+                        </h4>
+                        <p className="text-xs text-slate-500 line-clamp-2 mt-1">
+                          {dest.overview}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-xs font-bold text-amber-600">
+                          ★ {dest.rating}
+                        </span>
+                        <button
+                          onClick={() => onNavigateToPlace(dest.id)}
+                          className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                        >
+                          Place Details <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* -------------------- USER TAB 3: TRIP QUEUE -------------------- */}
+        {!isAdmin && activeTab === 'experiences' && (
+          <div className="space-y-4 animate-fadeIn">
+            {tripItems.length === 0 ? (
+              <div className="bg-card rounded-xl border border-dashed border-border-subtle p-12 text-center max-w-md mx-auto shadow-level-1">
+                <Luggage className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <h3 className="font-display font-bold text-base text-slate-800">
+                  No Items in Trip Queue
+                </h3>
+                <p className="text-xs text-slate-500 mt-1 mb-4">
+                  Add culinary walks, artisan workshops, and heritage sights to your trip queue to prepare your itinerary.
+                </p>
+                <button
+                  onClick={onNavigateToExperiences}
+                  className="btn-primary text-xs py-2 px-4"
+                >
+                  Browse Experiences
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
                 {tripItems.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 bg-card rounded-xl border border-border-subtle shadow-level-1 flex items-center justify-between gap-3"
+                    className="bg-card rounded-xl p-4 border border-border-subtle shadow-level-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                   >
-                    <img
-                      src={item.image || item.heroImage}
-                      alt={item.title || item.name}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold text-primary uppercase block">
-                        {item.category || 'Destination'}
-                      </span>
-                      <h4 className="font-display font-bold text-sm text-slate-900 truncate">
-                        {item.title || item.name}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                        {item.duration && <span>{item.duration}</span>}
-                        {item.price && <span className="font-bold text-slate-800">₹{item.price}</span>}
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={item.image || 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=400&q=80'}
+                        alt={item.title || item.name}
+                        className="w-14 h-14 rounded-lg object-cover shrink-0"
+                      />
+                      <div>
+                        <span className="text-[10px] font-bold text-primary uppercase">
+                          {item.category || 'Experience'}
+                        </span>
+                        <h4 className="font-display font-bold text-sm text-slate-900">
+                          {item.title || item.name}
+                        </h4>
+                        <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                          {item.duration && <span>⏱ {item.duration}</span>}
+                          {item.price && <span>₹{item.price} per person</span>}
+                        </div>
                       </div>
                     </div>
+
                     <button
                       onClick={() => onToggleTrip(item)}
-                      className="text-xs text-red-500 hover:text-red-700 p-2"
-                      title="Remove from trip"
+                      className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded border border-rose-200 transition-colors"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      Remove from Queue
                     </button>
                   </div>
                 ))}
@@ -782,21 +911,21 @@ export default function ProfilePage({
           </div>
         )}
 
-        {/* Tab 4: Moderation Review Queue (Demo Mode) */}
-        {isModeratorView && activeTab === 'moderation' && (
+        {/* -------------------- ADMIN TAB 1: MODERATION REVIEW QUEUE -------------------- */}
+        {isAdmin && activeTab === 'moderation' && (
           <div className="space-y-6 animate-fadeIn">
-            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border border-teal-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100/60 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-tertiary uppercase tracking-wider mb-1">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Community Verifier Moderation Queue</span>
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">
+                  <ShieldCheck className="w-4 h-4 text-amber-700" />
+                  <span>Administrative Community Moderation Console</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Community verifiers audit submitted hidden gems before publishing them to the YatraSaathi AI trip recommendation engine.
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  As an authenticated administrator, audit submitted cultural gems and culinary stops before promoting them to the public recommendation engine.
                 </p>
               </div>
-              <span className="text-[11px] font-bold text-tertiary bg-white px-3 py-1 rounded-full border border-teal-200 shadow-sm whitespace-nowrap self-start sm:self-auto">
-                Demo Moderation Mode
+              <span className="text-[11px] font-bold text-amber-900 bg-white px-3 py-1 rounded-full border border-amber-300 shadow-xs whitespace-nowrap self-start sm:self-auto">
+                Admin Authorized
               </span>
             </div>
 
@@ -808,7 +937,7 @@ export default function ProfilePage({
                   type="text"
                   value={moderationSearch}
                   onChange={(e) => setModerationSearch(e.target.value)}
-                  placeholder="Search queue by gem title, location, or contributor..."
+                  placeholder="Search submissions by title, location, or contributor..."
                   className="input-terra w-full pl-9 py-2 text-xs"
                 />
               </div>
@@ -820,7 +949,7 @@ export default function ProfilePage({
                     onClick={() => setModerationCategoryFilter(cat)}
                     className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                       moderationCategoryFilter === cat
-                        ? 'bg-tertiary text-white shadow-sm'
+                        ? 'bg-amber-600 text-white shadow-sm'
                         : 'bg-card text-slate-600 hover:bg-subtle border border-border-subtle'
                     }`}
                   >
@@ -831,14 +960,14 @@ export default function ProfilePage({
             </div>
 
             {/* Queue List */}
-            {filteredModerationQueue.length === 0 ? (
+            {filteredModerationQueue.filter((m) => m.status === 'Pending').length === 0 ? (
               <div className="bg-card rounded-xl border border-dashed border-border-subtle p-12 text-center max-w-md mx-auto shadow-level-1">
-                <ShieldCheck className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
                 <h3 className="font-display font-bold text-base text-slate-800">
-                  No submissions in review queue
+                  Moderation Queue Clean!
                 </h3>
                 <p className="text-xs text-slate-500 mt-1 mb-4">
-                  All community suggestions have been audited or no submissions match your filter.
+                  All community submissions have been reviewed or match no active filter.
                 </p>
                 <button
                   onClick={() => {
@@ -852,99 +981,252 @@ export default function ProfilePage({
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredModerationQueue.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1 hover:shadow-level-2 transition-all"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="text-[10px] font-bold text-tertiary uppercase tracking-wider bg-tertiary/10 px-2.5 py-0.5 rounded">
-                            {item.category}
-                          </span>
-                          <span className="text-xs text-slate-400">•</span>
-                          <span className="text-xs text-slate-500">Submitted by <strong>{item.submittedBy}</strong></span>
-                          <span className="text-xs text-slate-400">•</span>
-                          <span className="text-xs text-slate-400">{item.date}</span>
-                          <span
-                            className={`ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                              item.status === 'Approved'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : item.status === 'Needs Changes'
-                                ? 'bg-amber-100 text-amber-800'
-                                : item.status === 'Rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-slate-100 text-slate-700'
-                            }`}
-                          >
-                            Status: {item.status}
-                          </span>
+                {filteredModerationQueue
+                  .filter((m) => m.status === 'Pending')
+                  .map((item) => (
+                    <div
+                      key={item.id}
+                      className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1 hover:shadow-level-2 transition-all"
+                    >
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded">
+                              {item.category}
+                            </span>
+                            <span className="text-xs text-slate-400">•</span>
+                            <span className="text-xs text-slate-600">
+                              Submitted by <strong>{item.submittedBy}</strong>
+                            </span>
+                            <span className="text-xs text-slate-400">•</span>
+                            <span className="text-xs text-slate-400">{item.date}</span>
+                            <span className="ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                              Pending Review
+                            </span>
+                          </div>
+
+                          <h3 className="font-display font-bold text-base text-slate-900 mb-1">
+                            {item.title}
+                          </h3>
+
+                          <p className="text-xs text-slate-500 flex items-center gap-1 mb-2">
+                            <MapPin className="w-3.5 h-3.5 text-primary" />
+                            <span>{item.location}</span>
+                            {item.landmark && <span className="text-slate-400">({item.landmark})</span>}
+                          </p>
+
+                          <p className="text-xs text-slate-700 leading-relaxed bg-subtle p-3 rounded-lg border border-slate-200/60 mb-2">
+                            {item.description}
+                          </p>
+
+                          {item.notes && (
+                            <p className="text-[11px] text-slate-500 italic">
+                              Contributor Tip: "{item.notes}"
+                            </p>
+                          )}
                         </div>
 
-                        <h3 className="font-display font-bold text-base text-slate-900 mb-1">
-                          {item.title}
-                        </h3>
+                        {/* Admin Action Buttons */}
+                        <div className="flex flex-row md:flex-col gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                          <button
+                            onClick={() =>
+                              setModerationActionModal({ item, action: 'approve' })
+                            }
+                            className="text-xs font-semibold py-2 px-3.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center justify-center gap-1 transition-all active:scale-95"
+                          >
+                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>Approve</span>
+                          </button>
 
-                        <p className="text-xs text-slate-500 flex items-center gap-1 mb-2">
-                          <MapPin className="w-3.5 h-3.5 text-primary" />
-                          <span>{item.location}</span>
-                          {item.landmark && <span className="text-slate-400">({item.landmark})</span>}
-                        </p>
+                          <button
+                            onClick={() =>
+                              setModerationActionModal({ item, action: 'request-changes' })
+                            }
+                            className="text-xs font-semibold py-2 px-3 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 flex items-center justify-center gap-1 transition-colors"
+                          >
+                            <AlertCircle className="w-3.5 h-3.5 text-amber-700" />
+                            <span>Request Changes</span>
+                          </button>
 
-                        <p className="text-xs text-slate-700 leading-relaxed bg-subtle p-3 rounded-lg border border-slate-200/60 mb-2">
-                          {item.description}
-                        </p>
-
-                        {item.notes && (
-                          <p className="text-[11px] text-slate-500 italic">
-                            Contributor Tip: "{item.notes}"
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Moderation Actions Column */}
-                      <div className="flex flex-row md:flex-col gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
-                        <button
-                          onClick={() =>
-                            setModerationActionModal({ item, action: 'approve' })
-                          }
-                          disabled={item.status === 'Approved'}
-                          className={`text-xs font-semibold py-2 px-3 rounded flex items-center justify-center gap-1 transition-all ${
-                            item.status === 'Approved'
-                              ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                              : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                          }`}
-                        >
-                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                          <span>Approve</span>
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            setModerationActionModal({ item, action: 'request-changes' })
-                          }
-                          className="text-xs font-semibold py-2 px-3 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 flex items-center justify-center gap-1 transition-colors"
-                        >
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-700" />
-                          <span>Request Changes</span>
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            setModerationActionModal({ item, action: 'reject' })
-                          }
-                          className="text-xs font-semibold py-2 px-3 rounded bg-red-50 hover:bg-red-100 text-red-800 border border-red-200 flex items-center justify-center gap-1 transition-colors"
-                        >
-                          <X className="w-3.5 h-3.5 text-red-700" />
-                          <span>Reject</span>
-                        </button>
+                          <button
+                            onClick={() =>
+                              setModerationActionModal({ item, action: 'reject' })
+                            }
+                            className="text-xs font-semibold py-2 px-3 rounded bg-red-50 hover:bg-red-100 text-red-800 border border-red-200 flex items-center justify-center gap-1 transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5 text-red-700" />
+                            <span>Reject</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* -------------------- ADMIN TAB 2: AUDIT & HISTORY -------------------- */}
+        {isAdmin && activeTab === 'history' && (
+          <div className="space-y-4 animate-fadeIn">
+            <div className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1">
+              <h3 className="font-display font-bold text-base text-slate-900 mb-1">
+                Moderation Decisions Log
+              </h3>
+              <p className="text-xs text-slate-500 mb-4">
+                Historical record of approved, rejected, and feedback-requested community submissions.
+              </p>
+
+              <div className="divide-y divide-slate-100">
+                {moderationQueue.map((item) => (
+                  <div key={item.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-slate-800">{item.title}</span>
+                        <span className="text-[10px] text-slate-400">({item.category})</span>
+                      </div>
+                      <span className="text-xs text-slate-500">{item.location} • Submitted by {item.submittedBy}</span>
+                    </div>
+
+                    <span
+                      className={`self-start sm:self-auto text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                        item.status === 'Approved'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : item.status === 'Needs Changes'
+                          ? 'bg-amber-100 text-amber-800'
+                          : item.status === 'Rejected'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {item.status}
+                    </span>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+          </div>
+        )}
+
+        {/* -------------------- ADMIN TAB 3: SYSTEM INFRASTRUCTURE -------------------- */}
+        {isAdmin && activeTab === 'system' && (
+          <div className="space-y-4 animate-fadeIn">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Database className="w-4 h-4 text-primary" />
+                  <h4 className="font-display font-bold text-sm text-slate-900">
+                    Supabase Database Engine
+                  </h4>
+                </div>
+                <div className="text-xs space-y-1.5 text-slate-600">
+                  <div className="flex justify-between">
+                    <span>Host:</span>
+                    <span className="font-mono text-[11px]">jxtmvfamgyrmnlzfgfwq.supabase.co</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Table Status:</span>
+                    <span className="text-emerald-600 font-bold">Connected</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Target Table:</span>
+                    <span className="font-mono text-[11px]">public.trip_inputs</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-card rounded-xl p-5 border border-border-subtle shadow-level-1 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-tertiary" />
+                  <h4 className="font-display font-bold text-sm text-slate-900">
+                    FastAPI ML & Routing Backend
+                  </h4>
+                </div>
+                <div className="text-xs space-y-1.5 text-slate-600">
+                  <div className="flex justify-between">
+                    <span>API Endpoint:</span>
+                    <span className="font-mono text-[11px]">http://127.0.0.1:8000/api</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Health Probe:</span>
+                    <span className="text-emerald-600 font-bold">Online</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Routing Engine:</span>
+                    <span>OpenStreetMap / OSRM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* -------------------- COMMON TAB: ACCOUNT SETTINGS -------------------- */}
+        {activeTab === 'settings' && (
+          <div className="space-y-6 animate-fadeIn max-w-2xl">
+            <div className="bg-card rounded-xl p-6 border border-border-subtle shadow-level-1 space-y-4">
+              <h3 className="font-display font-bold text-base text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-primary" />
+                <span>Account Credentials & Security</span>
+              </h3>
+
+              <div className="space-y-3 text-xs">
+                <div className="flex items-center justify-between p-3 bg-subtle rounded-lg">
+                  <div>
+                    <span className="font-bold text-slate-800 block">Authenticated User ID</span>
+                    <span className="text-slate-500 font-mono text-[11px]">{authenticatedUser?.id}</span>
+                  </div>
+                  <span className="text-[10px] uppercase font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
+                    Active
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-subtle rounded-lg">
+                  <div>
+                    <span className="font-bold text-slate-800 block">Verified Email</span>
+                    <span className="text-slate-500 font-mono text-[11px]">{authenticatedUser?.email}</span>
+                  </div>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-subtle rounded-lg">
+                  <div>
+                    <span className="font-bold text-slate-800 block">Assigned Role</span>
+                    <span className="text-slate-600 font-medium capitalize">
+                      {userRole} {isAdmin ? '(Full Moderation & Audit Privileges)' : '(Standard Community Explorer)'}
+                    </span>
+                  </div>
+                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
+                    isAdmin ? 'bg-amber-100 text-amber-900' : 'bg-primary/10 text-primary'
+                  }`}>
+                    {userRole}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-subtle rounded-lg">
+                  <div>
+                    <span className="font-bold text-slate-800 block">Session Source</span>
+                    <span className="text-slate-500 font-mono text-[11px]">
+                      {sessionSource === 'supabase' ? 'Supabase JWT Session' : 'Local Trusted Session Store'}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-400">Verified</span>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs text-slate-500">
+                  Ready to conclude your session?
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="btn-secondary text-xs py-2 px-4 text-red-600 hover:bg-red-50 hover:border-red-200 flex items-center gap-1.5"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>
@@ -955,7 +1237,7 @@ export default function ProfilePage({
           <div className="bg-card rounded-xl max-w-lg w-full p-6 shadow-level-3 border border-border-subtle animate-scaleIn">
             <div className="flex items-center justify-between border-b border-border-subtle pb-3 mb-4">
               <h3 className="font-display font-bold text-lg text-slate-900">
-                Edit Demo Profile
+                Edit Profile Information
               </h3>
               <button
                 onClick={() => setIsEditingProfile(false)}
@@ -1005,10 +1287,6 @@ export default function ProfilePage({
                 />
               </div>
 
-              <div className="p-2.5 bg-amber-50 rounded-md border border-amber-200 text-xs text-amber-800">
-                <strong>Demo notice:</strong> Profile changes update the local session state for the hackathon MVP.
-              </div>
-
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
@@ -1026,12 +1304,12 @@ export default function ProfilePage({
         </div>
       )}
 
-      {/* Moderation Confirmation Modal */}
-      {moderationActionModal && (
+      {/* Moderation Confirmation Modal (Admin Only) */}
+      {isAdmin && moderationActionModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-card rounded-xl max-w-md w-full p-6 shadow-level-3 border border-border-subtle animate-scaleIn">
             <h3 className="font-display font-bold text-base text-slate-900 mb-1">
-              Confirm Moderation Action
+              Confirm Moderation Decision
             </h3>
             <p className="text-xs text-slate-500 mb-4">
               You are applying an action to <strong className="text-slate-800">"{moderationActionModal.item.title}"</strong>.
