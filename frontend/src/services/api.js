@@ -41,6 +41,17 @@ export async function fetchItineraryPlan(tripParams) {
   }
 }
 
+export async function fetchItineraryById(tripId) {
+  try {
+    const res = await fetch(`${API_BASE}/itinerary/${tripId}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('Backend itinerary fetch by ID error:', err);
+    return null;
+  }
+}
+
 export async function submitTripInputs(tripPayload) {
   try {
     const res = await fetch(`${API_BASE}/trips/submit`, {

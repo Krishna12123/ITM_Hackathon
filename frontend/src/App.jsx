@@ -110,8 +110,8 @@ export default function App() {
 
   const handleTabChange = (tab) => {
     let targetTab = tab;
-    if (tab === 'home') targetTab = 'experiences';
-    if (tab === 'explore') targetTab = 'experiences';
+    if (tab === 'home' || tab === 'explore') targetTab = 'experiences';
+    if (tab === 'route-budget') targetTab = 'route_budget';
 
     setActiveTab(targetTab);
     if (targetTab === 'experiences') {

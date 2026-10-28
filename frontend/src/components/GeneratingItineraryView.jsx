@@ -1,13 +1,54 @@
 import React, { useEffect } from 'react';
+import { fetchItineraryPlan } from '../services/api';
 
 export default function GeneratingItineraryView({ onNavigate }) {
   useEffect(() => {
+    // 1. Fetch ML Itinerary in Background
+    const runGeneration = async () => {
+      try {
+        const stored = localStorage.getItem('active_trip_inputs');
+        const params = stored ? JSON.parse(stored) : {
+          destination: 'Udaipur, Rajasthan',
+          days: 4,
+          guests: 2,
+          budget: 18500,
+          spend_per_person: 18500,
+          interests: ['heritage', 'culinary', 'nature', 'art'],
+          spiritual_traditions: ['hindu_temples', 'jain_architecture'],
+          pacing: 'Balanced',
+          transit_mode: 'auto_walk'
+        };
+
+        const plan = await fetchItineraryPlan(params);
+        if (plan) {
+          localStorage.setItem('generated_smart_itinerary', JSON.stringify(plan));
+          if (plan.trip_id) {
+            localStorage.setItem('active_trip_id', plan.trip_id);
+          }
+          const tickerElem = document.getElementById('ticker-text');
+          if (tickerElem) tickerElem.textContent = "Synced with Supabase! Preparing smart itinerary...";
+          const percentElem = document.getElementById('percent-display');
+          if (percentElem) percentElem.textContent = "100%";
+          const progressFill = document.getElementById('progress-bar-fill');
+          if (progressFill) progressFill.style.width = "100%";
+
+          setTimeout(() => {
+            if (onNavigate) onNavigate('itinerary');
+          }, 1200);
+        }
+      } catch (err) {
+        console.warn('ML Itinerary fetch background note:', err);
+      }
+    };
+
+    runGeneration();
+
     const phrases = [
-      "Aligning Jagdish Temple morning aarti ceremony timings...",
-      "Evaluating lake water levels for Gangaur Ghat sunset photography...",
-      "Checking acoustic tranquility indices near Bagore Ki Haveli...",
+      "Running Sentence Transformers semantic matching on regional attractions...",
+      "Executing Google OR-Tools routing & opening-hours constraint solver...",
+      "Evaluating Lake Pichola water levels for sunset photography...",
       "Balancing afternoon heat index with shaded café rest stops...",
-      "Confirming priority rooftop reservation at Ambrai Restaurant..."
+      "Generating Gemini cultural narratives & verified budget ledgers..."
     ];
     
     let stepIndex = 0;

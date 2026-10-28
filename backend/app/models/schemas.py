@@ -17,6 +17,7 @@ class PredictionResponse(BaseModel):
     status: str = "success"
 
 class ItineraryRequest(BaseModel):
+    trip_id: Optional[str] = Field(default=None, description="Supabase UUID for trip inputs")
     destination: str = Field(default="Udaipur, Rajasthan")
     start_date: Optional[str] = Field(default="Oct 14")
     end_date: Optional[str] = Field(default="Oct 18")
@@ -27,7 +28,7 @@ class ItineraryRequest(BaseModel):
     budget: float = Field(default=18500.0)
     total_budget: Optional[float] = Field(default=37000.0)
     budget_tier: Optional[str] = Field(default="Comfortable Boutique")
-    budget_breakdown: Optional[Dict[str, float]] = None
+    budget_breakdown: Optional[Dict[str, Any]] = None
     interests: List[str] = Field(default_factory=lambda: ["Heritage & Forts", "Nature & Lakes"])
     spiritual_traditions: Optional[List[str]] = Field(default_factory=list)
     pacing: Optional[str] = Field(default="Balanced")
@@ -75,9 +76,43 @@ class TripInputResponse(BaseModel):
     supabase_synced: bool = False
 
 class ItineraryResponse(BaseModel):
+    trip_id: Optional[str] = None
     destination: str
     days: int
     guests: int
     total_budget: float
-    budget_breakdown: Dict[str, float]
+    budget_breakdown: Optional[Dict[str, Any]] = None
     status: str = "success"
+    supabase_synced: bool = False
+    destination_intelligence: Optional[Dict[str, Any]] = None
+    budget_ledger: Optional[Dict[str, Any]] = None
+    itinerary_days: Optional[List[Dict[str, Any]]] = None
+    map_waypoints: Optional[List[Dict[str, Any]]] = None
+    ml_model_metadata: Optional[Dict[str, Any]] = None
+    validation: Optional[Dict[str, Any]] = None
+
+
+class PaymentCheckoutRequest(BaseModel):
+    amount: float = Field(..., gt=0, description="Amount in INR to be charged")
+    trip_destination: str = Field(..., description="Destination associated with the trip")
+    customer_email: Optional[str] = Field(None, description="Contact email for checkout session")
+    customer_name: Optional[str] = Field(None, description="Customer name")
+    success_url: Optional[str] = None
+    cancel_url: Optional[str] = None
+
+class PaymentCheckoutResponse(BaseModel):
+    session_id: str
+    order_id: str
+    checkout_url: str
+    amount: float
+    currency: str
+    status: str
+
+class PaymentVerifyRequest(BaseModel):
+    session_id: str
+
+class PaymentVerifyResponse(BaseModel):
+    success: bool
+    session_id: str
+    status: str
+    transaction: Optional[Dict[str, Any]] = None

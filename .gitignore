@@ -32,6 +32,7 @@ ml_model/data/raw/*
 !ml_model/data/raw/.gitkeep
 ml_model/data/processed/*
 !ml_model/data/processed/.gitkeep
+!ml_model/data/processed/attractions.json
 *.h5
 *.pkl
 *.pt
