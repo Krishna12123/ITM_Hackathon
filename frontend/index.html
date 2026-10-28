@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TerraVenture - AI Trip Planner & Smart Itinerary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+      @layer base {
+        html, body { margin: 0; padding: 0; }
+        body { overscroll-behavior: none; }
+        main > :first-child { margin-top: 0 !important; }
+        main > :last-child { margin-bottom: 0 !important; }
+      }
+      ::-webkit-scrollbar { display: none; }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "secondary-fixed-dim": "#3cddc7",
+              "tertiary": "#231fb5",
+              "surface-container-low": "#eff4ff",
+              "outline-variant": "#bfc8cd",
+              "alert-danger": "#EF4444",
+              "secondary": "#006b5f",
+              "on-tertiary-container": "#c4c4ff",
+              "on-error-container": "#93000a",
+              "on-surface": "#0b1c30",
+              "secondary-container": "#62fae3",
+              "surface-tint": "#1e667f",
+              "primary": "#004357",
+              "alert-warning": "#F59E0B",
+              "surface-container": "#e5eeff",
+              "secondary-fixed": "#62fae3",
+              "on-primary-container": "#93d3ef",
+              "surface-container-highest": "#d3e4fe",
+              "on-secondary-container": "#007165",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed-dim": "#90cfec",
+              "on-error": "#ffffff",
+              "primary-container": "#0d5c75",
+              "surface-canvas": "#F8FAFC",
+              "mint-light": "#F0FDFA",
+              "tertiary-fixed": "#e1e0ff",
+              "clinical-navy": "#0F172A",
+              "on-primary-fixed": "#001f2a",
+              "on-tertiary-fixed": "#07006c",
+              "on-primary": "#ffffff",
+              "surface-card": "#FFFFFF",
+              "outline": "#70787d",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#40484c",
+              "tertiary-container": "#3e3fcc",
+              "primary-fixed": "#bde9ff",
+              "inverse-surface": "#213145",
+              "background": "#f8f9ff",
+              "on-secondary-fixed": "#00201c",
+              "surface-variant": "#d3e4fe",
+              "inverse-primary": "#90cfec",
+              "surface-dim": "#cbdbf5",
+              "tertiary-fixed-dim": "#c0c1ff",
+              "surface-bright": "#f8f9ff",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-background": "#0b1c30",
+              "on-secondary-fixed-variant": "#005047",
+              "on-tertiary-fixed-variant": "#2f2ebe",
+              "on-secondary": "#ffffff",
+              "inverse-on-surface": "#eaf1ff",
+              "alert-success": "#10B981",
+              "on-primary-fixed-variant": "#004d64",
+              "surface-container-high": "#dce9ff",
+              "surface": "#f8f9ff"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "space-lg": "1.5rem",
+              "space-sm": "0.5rem",
+              "space-xl": "2.5rem",
+              "gutter-mobile": "1rem",
+              "gutter": "1.5rem",
+              "space-xs": "0.25rem",
+              "margin-mobile": "1rem",
+              "space-md": "1rem",
+              "margin": "2rem"
+            },
+            "fontFamily": {
+              "body-md": ["Plus Jakarta Sans"],
+              "headline-xl": ["Manrope"],
+              "headline-md": ["Manrope"],
+              "headline-sm": ["Manrope"],
+              "label-md": ["Plus Jakarta Sans"],
+              "body-lg": ["Plus Jakarta Sans"],
+              "label-sm": ["Plus Jakarta Sans"],
+              "body-sm": ["Plus Jakarta Sans"],
+              "headline-lg-mobile": ["Manrope"],
+              "headline-lg": ["Manrope"],
+              "headline-xl-mobile": ["Manrope"],
+              "label-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+              "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+              "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+              "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+              "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+              "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+              "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+              "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+              "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+              "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+              "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+              "headline-xl-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+              "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+            }
+          }
+        }
+      };
+    </script>
+  </head>
+  <body class="bg-surface font-body-md text-on-surface antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

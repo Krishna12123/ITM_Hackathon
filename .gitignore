@@ -1,0 +1,39 @@
+# Node.js / React
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables
+.env
+!.env.example
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Machine Learning & Data (large files)
+ml_model/data/raw/*
+!ml_model/data/raw/.gitkeep
+ml_model/data/processed/*
+!ml_model/data/processed/.gitkeep
+*.h5
+*.pkl
+*.pt
+*.onnx
+.ipynb_checkpoints/

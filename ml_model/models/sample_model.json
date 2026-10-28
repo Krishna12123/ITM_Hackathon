@@ -1,0 +1,19 @@
+{
+  "model_name": "HackathonClassifier",
+  "version": "1.0.0",
+  "weights": [
+    0.45,
+    -0.32,
+    0.78,
+    0.12
+  ],
+  "bias": 0.15,
+  "classes": [
+    "Negative",
+    "Positive"
+  ],
+  "metrics": {
+    "accuracy": 0.942,
+    "f1_score": 0.938
+  }
+}
