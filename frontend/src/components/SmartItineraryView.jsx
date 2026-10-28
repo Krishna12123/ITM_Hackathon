@@ -246,7 +246,26 @@ export default function SmartItineraryView({ onNavigate }) {
   const [activePlan, setActivePlan] = useState(() => {
     try {
       const raw = localStorage.getItem('generated_smart_itinerary');
-      return raw ? JSON.parse(raw) : null;
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (parsed && parsed.status !== 'error') return parsed;
+      const inputsRaw = localStorage.getItem('active_trip_inputs');
+      if (inputsRaw) {
+        const inp = JSON.parse(inputsRaw);
+        return {
+          destination: inp.destination,
+          days: inp.days,
+          duration_days: inp.days,
+          nights: inp.nights,
+          start_date: inp.start_date,
+          end_date: inp.end_date,
+          travelers: inp.guests,
+          spend_per_person: inp.spend_per_person,
+          total_budget: inp.total_budget,
+          travel_pace: inp.pacing,
+          transit_mode: inp.transit_mode
+        };
+      }
+      return null;
     } catch (e) {
       return null;
     }

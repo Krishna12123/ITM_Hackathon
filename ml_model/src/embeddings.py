@@ -23,13 +23,9 @@ class EmbeddingEngine:
             # Load from local cache without online check
             self.model = SentenceTransformer(self.model_name, local_files_only=True)
         except Exception as e:
-            try:
-                from sentence_transformers import SentenceTransformer
-                self.model = SentenceTransformer(self.model_name)
-            except Exception as e2:
-                print(f"[EmbeddingEngine] Note: Using Scikit-Learn TF-IDF vectorizer fallback: {e2}")
-                from sklearn.feature_extraction.text import TfidfVectorizer
-                self.tfidf = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
+            print(f"[EmbeddingEngine] Note: Using Scikit-Learn TF-IDF vectorizer fallback: {e}")
+            from sklearn.feature_extraction.text import TfidfVectorizer
+            self.tfidf = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
 
     def encode(self, texts: List[str]) -> np.ndarray:
         """
@@ -39,7 +35,10 @@ class EmbeddingEngine:
             embeddings = self.model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
             return embeddings
         else:
-            tfidf_mat = self.tfidf.fit_transform(texts).toarray()
+            if hasattr(self.tfidf, "vocabulary_"):
+                tfidf_mat = self.tfidf.transform(texts).toarray()
+            else:
+                tfidf_mat = self.tfidf.fit_transform(texts).toarray()
             # L2 normalize
             norms = np.linalg.norm(tfidf_mat, axis=1, keepdims=True)
             norms[norms == 0] = 1.0
