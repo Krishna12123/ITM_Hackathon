@@ -92,6 +92,7 @@ if __name__ == "__main__":
     }
     result = inference.generate_itinerary(test_pref)
     print("Status:", result.get("status"))
+    print("Validation Result:", result.get("validation"))
     print("Destination Intelligence:", result.get("destination_intelligence", {}).get("destination_overview")[:80], "...")
     print("Days generated:", len(result.get("itinerary_days", [])))
     print("Total budget ledger:", result.get("budget_ledger", {}).get("total_budget"))

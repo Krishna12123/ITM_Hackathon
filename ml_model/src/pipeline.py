@@ -9,12 +9,14 @@ try:
     from .optimizer import optimizer
     from .route_budget import route_budget_engine
     from .ai_synthesis import ai_synthesis_engine
+    from .validator import validate_itinerary
 except ImportError:
     from gemini_service import gemini_service
     from recommender import recommender
     from optimizer import optimizer
     from route_budget import route_budget_engine
     from ai_synthesis import ai_synthesis_engine
+    from validator import validate_itinerary
 
 logger = logging.getLogger("itinerary_pipeline")
 
@@ -159,7 +161,7 @@ class ItineraryMLPipeline:
             })
 
         # Assemble full output package
-        return {
+        output_payload = {
             "status": "success",
             "destination": destination,
             "destination_intelligence": dest_intel,
@@ -176,5 +178,11 @@ class ItineraryMLPipeline:
                 "ai_synthesis": "Gemini 2.5 Structured Narrative Engine"
             }
         }
+
+        # Validate against strict mathematical & duration constraints
+        validation = validate_itinerary(user_preferences, output_payload)
+        output_payload["validation"] = validation
+
+        return output_payload
 
 pipeline = ItineraryMLPipeline()
