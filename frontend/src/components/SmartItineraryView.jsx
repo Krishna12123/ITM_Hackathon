@@ -450,7 +450,7 @@ export default function SmartItineraryView({ onNavigate }) {
                   <path d="M140,0 C170,80 210,140 180,220 C150,300 110,380 130,480 C150,580 230,640 210,700 L0,700 L0,0 Z" fill="url(#lakeGradient)" />
                   {/* City Palace Island / Jag Mandir in Lake */}
                   <rect fill="#eff4ff" height="24" rx="6" stroke="#bfc8cd" strokeWidth="1.5" width="34" x="70" y="340" />
-                  <text fill="#004357" fontFamily="Plus Jakarta Sans" fontSize="9" fontWeight="600" x="75" y="356">JAG NIWAS</text>
+                  <text fill="#EA580C" fontFamily="Plus Jakarta Sans" fontSize="9" fontWeight="600" x="75" y="356">JAG NIWAS</text>
                   {/* Secondary water channel (Swaroop Sagar) */}
                   <path d="M220,0 C250,70 310,90 300,150 C290,210 240,240 230,300" fill="none" stroke="#93d3ef" strokeLinecap="round" strokeWidth="18" />
                   {/* Old City Urban Block Geometries */}
@@ -464,12 +464,12 @@ export default function SmartItineraryView({ onNavigate }) {
                   <path d="M340,330 L490,360 L520,480" fill="none" stroke="#cbdbf5" strokeWidth="3" />
                   {/* CONNECTING ROUTE POLYLINE (Numbered Stops 1 -> 2 -> 3 -> 4) */}
                   {/* Stop 1 (310, 190) -> Stop 2 (240, 240) -> Stop 3 (360, 360) -> Stop 4 (235, 450) */}
-                  <path d="M310,190 Q270,210 240,240 Q310,290 360,360 Q300,410 235,450" fill="none" stroke="#004357" strokeDasharray="9 5" strokeLinecap="round" strokeWidth="5" />
+                  <path d="M310,190 Q270,210 240,240 Q310,290 360,360 Q300,410 235,450" fill="none" stroke="#EA580C" strokeDasharray="9 5" strokeLinecap="round" strokeWidth="5" />
                   <path d="M310,190 Q270,210 240,240 Q310,290 360,360 Q300,410 235,450" fill="none" stroke="#62fae3" strokeLinecap="round" strokeWidth="2" />
                   {/* WAYPOINT PIN 1: Jagdish Temple */}
                   <g className="cursor-pointer" filter="url(#shadowGlow)" transform="translate(310, 190)">
-                    <circle fill="#004357" r="18" />
-                    <circle className="animate-ping" opacity="0.3" r="22" stroke="#004357" strokeWidth="2" />
+                    <circle fill="#EA580C" r="18" />
+                    <circle className="animate-ping" opacity="0.3" r="22" stroke="#EA580C" strokeWidth="2" />
                     <text dy="5" fill="#ffffff" fontFamily="Plus Jakarta Sans" fontSize="13" fontWeight="700" textAnchor="middle">1</text>
                     {/* Label tag */}
                     <rect fill="#0b1c30" height="24" opacity="0.9" rx="6" width="104" x="24" y="-12" />
@@ -477,31 +477,31 @@ export default function SmartItineraryView({ onNavigate }) {
                   </g>
                   {/* WAYPOINT PIN 2: Jheel Sunrise Cafe */}
                   <g className="cursor-pointer" filter="url(#shadowGlow)" transform="translate(240, 240)">
-                    <circle fill="#004357" r="16" />
+                    <circle fill="#EA580C" r="16" />
                     <text dy="5" fill="#ffffff" fontFamily="Plus Jakarta Sans" fontSize="12" fontWeight="700" textAnchor="middle">2</text>
                     <rect fill="#0b1c30" height="24" opacity="0.9" rx="6" width="96" x="-120" y="-12" />
                     <text fill="#ffffff" fontFamily="Plus Jakarta Sans" fontSize="10" fontWeight="600" x="-112" y="4">Jheel's Café</text>
                   </g>
                   {/* WAYPOINT PIN 3: Painting Workshop (ACTIVE PULSING) */}
                   <g className="cursor-pointer" filter="url(#shadowGlow)" transform="translate(360, 360)">
-                    <circle fill="#004357" r="20" />
-                    <circle opacity="0.6" r="28" stroke="#006b5f" strokeWidth="2.5" />
+                    <circle fill="#EA580C" r="20" />
+                    <circle opacity="0.6" r="28" stroke="#0F766E" strokeWidth="2.5" />
                     <text dy="5" fill="#62fae3" fontFamily="Plus Jakarta Sans" fontSize="14" fontWeight="800" textAnchor="middle">3</text>
                     {/* Callout badge */}
-                    <rect fill="#004357" height="28" rx="8" width="128" x="26" y="-14" />
+                    <rect fill="#EA580C" height="28" rx="8" width="128" x="26" y="-14" />
                     <text fill="#62fae3" fontFamily="Plus Jakarta Sans" fontSize="11" fontWeight="700" x="36" y="4">Mewar Art Studio ★</text>
                   </g>
                   {/* WAYPOINT PIN 4: Bagore Ki Haveli / Sunset Ghat */}
                   <g className="cursor-pointer" filter="url(#shadowGlow)" transform="translate(235, 450)">
-                    <circle fill="#004357" r="16" />
+                    <circle fill="#EA580C" r="16" />
                     <text dy="5" fill="#ffffff" fontFamily="Plus Jakarta Sans" fontSize="12" fontWeight="700" textAnchor="middle">4</text>
                     <rect fill="#0b1c30" height="24" opacity="0.9" rx="6" width="112" x="-132" y="-12" />
                     <text fill="#ffffff" fontFamily="Plus Jakarta Sans" fontSize="10" fontWeight="600" x="-124" y="4">Bagore Ki Haveli</text>
                   </g>
                   {/* Lake Landmark Icon */}
                   <g transform="translate(85, 230)">
-                    <text fill="#004357" fontFamily="Plus Jakarta Sans" fontSize="12" fontWeight="700" letterSpacing="2" opacity="0.6" x="0" y="0">LAKE PICHOLA</text>
-                    <text fill="#006b5f" fontFamily="Plus Jakarta Sans" fontSize="9" opacity="0.5" x="14" y="14">Calm Waters · 24°C</text>
+                    <text fill="#EA580C" fontFamily="Plus Jakarta Sans" fontSize="12" fontWeight="700" letterSpacing="2" opacity="0.6" x="0" y="0">LAKE PICHOLA</text>
+                    <text fill="#0F766E" fontFamily="Plus Jakarta Sans" fontSize="9" opacity="0.5" x="14" y="14">Calm Waters · 24°C</text>
                   </g>
                 </svg>
               </div>

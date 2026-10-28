@@ -1,74 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import TripPlannerView from './components/TripPlannerView';
-import GeneratingItineraryView from './components/GeneratingItineraryView';
-import SmartItineraryView from './components/SmartItineraryView';
-import RouteMapBudgetView from './components/RouteMapBudgetView';
 import ExperiencesPage from './pages/ExperiencesPage';
 import PlaceDetailsPage from './pages/PlaceDetailsPage';
 import ContributionFormPage from './pages/ContributionFormPage';
 import ProfilePage from './pages/ProfilePage';
+import StateDestinationPage from './pages/StateDestinationPage';
+import TripPlannerView from './components/TripPlannerView';
+import GeneratingItineraryView from './components/GeneratingItineraryView';
+import SmartItineraryView from './components/SmartItineraryView';
+import RouteMapBudgetView from './components/RouteMapBudgetView';
 import TripDrawer from './components/TripDrawer';
 import Footer from './components/Footer';
-
-const PATH_TO_VIEW = {
-  '/': 'experiences',
-  '/experiences': 'experiences',
-  '/place-details': 'place-details',
-  '/planner': 'planner',
-  '/generating': 'generating',
-  '/itinerary': 'itinerary',
-  '/route-budget': 'route_budget',
-  '/route_budget': 'route_budget',
-  '/contribute': 'contribute',
-  '/profile': 'profile',
-};
-
-const VIEW_TO_PATH = {
-  'experiences': '/experiences',
-  'place-details': '/place-details',
-  'planner': '/planner',
-  'generating': '/generating',
-  'itinerary': '/itinerary',
-  'route_budget': '/route-budget',
-  'contribute': '/contribute',
-  'profile': '/profile',
-};
-
-function getViewFromPath() {
-  if (typeof window === 'undefined') return 'experiences';
-  const path = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
-  return PATH_TO_VIEW[path] || 'experiences';
-}
+import { Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
-  const [currentView, setCurrentViewState] = useState(getViewFromPath);
-
-  const setCurrentView = (target) => {
-    const viewId = PATH_TO_VIEW[target] || target;
-    const path = VIEW_TO_PATH[viewId] || (target.startsWith('/') ? target : `/${target}`);
-
-    if (window.location.pathname !== path) {
-      window.history.pushState({ view: viewId }, '', path);
-    }
-    setCurrentViewState(viewId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    const handlePopState = () => {
-      setCurrentViewState(getViewFromPath());
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    // If initial landing was root '/', sync browser address bar to '/experiences'
-    if (window.location.pathname === '/' || !window.location.pathname) {
-      window.history.replaceState({ view: 'experiences' }, '', '/experiences');
-    }
-
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  const [activeTab, setActiveTab] = useState('experiences');
+  const [selectedDestinationId, setSelectedDestinationId] = useState('amber-fort');
+  const [selectedStateId, setSelectedStateId] = useState('rajasthan');
 
   // Wishlist / Favorites persisted in browser localStorage
   const [favorites, setFavorites] = useState(() => {
@@ -86,7 +34,6 @@ export default function App() {
     } catch (e) {}
   }, [favorites]);
 
-  // Trip Items State
   const [tripItems, setTripItems] = useState([
     {
       id: 'exp-food-walk',
@@ -147,76 +94,179 @@ export default function App() {
     showToast('Trip itinerary cleared');
   };
 
+  // Navigation handlers with URL history push
+  const navigateToState = (stateId) => {
+    setSelectedStateId(stateId);
+    setActiveTab('state-details');
+    window.history.pushState({ tab: 'state-details', stateId }, '', `/explore/${stateId}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToExplore = () => {
+    setActiveTab('experiences');
+    window.history.pushState({ tab: 'experiences' }, '', '/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === 'experiences') {
+      window.history.pushState({ tab: 'experiences' }, '', '/');
+    } else if (tab === 'place-details') {
+      window.history.pushState({ tab: 'place-details' }, '', '/place-details');
+    } else if (tab === 'contribute') {
+      window.history.pushState({ tab: 'contribute' }, '', '/contribute');
+    } else if (tab === 'profile') {
+      window.history.pushState({ tab: 'profile' }, '', '/profile');
+    } else if (tab === 'planner') {
+      window.history.pushState({ tab: 'planner' }, '', '/planner');
+    } else if (tab === 'generating') {
+      window.history.pushState({ tab: 'generating' }, '', '/generating');
+    } else if (tab === 'itinerary') {
+      window.history.pushState({ tab: 'itinerary' }, '', '/itinerary');
+    } else if (tab === 'route_budget') {
+      window.history.pushState({ tab: 'route_budget' }, '', '/route-budget');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Browser route synchronization on load and on popstate (browser back/forward)
+  useEffect(() => {
+    const syncRouteFromUrl = () => {
+      const path = window.location.pathname.toLowerCase();
+      const validStates = ['rajasthan', 'gujarat', 'west-bengal', 'assam'];
+
+      // Match /explore/:stateId
+      const exploreMatch = path.match(/^\/explore\/([a-z-]+)\/?$/);
+      if (exploreMatch && validStates.includes(exploreMatch[1])) {
+        setSelectedStateId(exploreMatch[1]);
+        setActiveTab('state-details');
+        return;
+      }
+
+      if (path.startsWith('/place-details') || path.startsWith('/places')) {
+        setActiveTab('place-details');
+      } else if (path.startsWith('/planner')) {
+        setActiveTab('planner');
+      } else if (path.startsWith('/generating')) {
+        setActiveTab('generating');
+      } else if (path.startsWith('/itinerary')) {
+        setActiveTab('itinerary');
+      } else if (path.startsWith('/route-budget') || path.startsWith('/route_budget')) {
+        setActiveTab('route_budget');
+      } else if (path.startsWith('/contribute')) {
+        setActiveTab('contribute');
+      } else if (path.startsWith('/profile')) {
+        setActiveTab('profile');
+      } else {
+        setActiveTab('experiences');
+      }
+    };
+
+    syncRouteFromUrl();
+    window.addEventListener('popstate', syncRouteFromUrl);
+    return () => window.removeEventListener('popstate', syncRouteFromUrl);
+  }, []);
+
   return (
-    <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-canvas font-sans text-slate-900">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-4 sm:right-8 z-50 animate-slideDown">
           <div className="bg-slate-900 text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-lg shadow-level-3 border border-slate-700 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary" />
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             <span>{toastMessage}</span>
           </div>
         </div>
       )}
 
-      {/* Shared Header Navigation */}
+      {/* Main Navbar */}
       <Navbar
-        currentView={currentView}
-        setCurrentView={setCurrentView}
+        activeTab={activeTab === 'state-details' ? 'experiences' : activeTab}
+        setActiveTab={handleTabChange}
+        tripItems={tripItems}
+        favoritesCount={favorites.length}
         onOpenTrip={() => setIsTripDrawerOpen(true)}
-        tripCount={tripItems.length}
       />
 
-      {/* Main View Router */}
+      {/* Dynamic View rendering assigned modules */}
       <main className="flex-1 w-full">
-        {/* Bhavna's Modules */}
-        {currentView === 'experiences' && (
+        {activeTab === 'state-details' && (
+          <StateDestinationPage
+            stateId={selectedStateId}
+            onBackToExplore={navigateToExplore}
+            onNavigateToPlace={(destId) => {
+              if (destId) setSelectedDestinationId(destId);
+              setActiveTab('place-details');
+              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
+            }}
+            onSelectOtherState={(stId) => {
+              navigateToState(stId);
+            }}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            tripItems={tripItems}
+            onToggleTrip={handleToggleTrip}
+          />
+        )}
+        {activeTab === 'experiences' && (
           <ExperiencesPage
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
+            onNavigateToPlace={(destId) => {
+              if (destId) setSelectedDestinationId(destId);
+              setActiveTab('place-details');
+              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
+            }}
+            onNavigateToState={navigateToState}
           />
         )}
-        {currentView === 'place-details' && (
+        {activeTab === 'place-details' && (
           <PlaceDetailsPage
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
-            onNavigateToExperiences={() => setCurrentView('experiences')}
+            selectedDestinationId={selectedDestinationId}
+            onSelectDestination={setSelectedDestinationId}
+            onNavigateToExperiences={navigateToExplore}
           />
         )}
-        {currentView === 'contribute' && (
+        {activeTab === 'contribute' && (
           <ContributionFormPage
-            onCancel={() => setCurrentView('experiences')}
+            onCancel={navigateToExplore}
             onShowToast={showToast}
           />
         )}
-        {currentView === 'profile' && (
+        {activeTab === 'profile' && (
           <ProfilePage
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
-            onNavigateToPlace={() => setCurrentView('place-details')}
-            onNavigateToExperiences={() => setCurrentView('experiences')}
+            onNavigateToPlace={() => {
+              setActiveTab('place-details');
+              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
+            }}
+            onNavigateToExperiences={navigateToExplore}
             onShowToast={showToast}
           />
         )}
 
-        {/* Team Planner Views */}
-        {currentView === 'planner' && (
-          <TripPlannerView onNavigate={setCurrentView} />
+        {/* Teammate Expedition & Itinerary Views */}
+        {activeTab === 'planner' && (
+          <TripPlannerView onNavigate={handleTabChange} />
         )}
-        {currentView === 'generating' && (
-          <GeneratingItineraryView onNavigate={setCurrentView} />
+        {activeTab === 'generating' && (
+          <GeneratingItineraryView onNavigate={handleTabChange} />
         )}
-        {currentView === 'itinerary' && (
-          <SmartItineraryView onNavigate={setCurrentView} />
+        {activeTab === 'itinerary' && (
+          <SmartItineraryView onNavigate={handleTabChange} />
         )}
-        {currentView === 'route_budget' && (
-          <RouteMapBudgetView onNavigate={setCurrentView} />
+        {activeTab === 'route_budget' && (
+          <RouteMapBudgetView onNavigate={handleTabChange} />
         )}
       </main>
 
@@ -229,7 +279,7 @@ export default function App() {
         onClearTrip={handleClearTrip}
       />
 
-      {/* Footer */}
+      {/* Teammate Footer */}
       <Footer />
     </div>
   );
