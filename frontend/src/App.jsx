@@ -11,8 +11,64 @@ import ProfilePage from './pages/ProfilePage';
 import TripDrawer from './components/TripDrawer';
 import Footer from './components/Footer';
 
+const PATH_TO_VIEW = {
+  '/': 'experiences',
+  '/experiences': 'experiences',
+  '/place-details': 'place-details',
+  '/planner': 'planner',
+  '/generating': 'generating',
+  '/itinerary': 'itinerary',
+  '/route-budget': 'route_budget',
+  '/route_budget': 'route_budget',
+  '/contribute': 'contribute',
+  '/profile': 'profile',
+};
+
+const VIEW_TO_PATH = {
+  'experiences': '/experiences',
+  'place-details': '/place-details',
+  'planner': '/planner',
+  'generating': '/generating',
+  'itinerary': '/itinerary',
+  'route_budget': '/route-budget',
+  'contribute': '/contribute',
+  'profile': '/profile',
+};
+
+function getViewFromPath() {
+  if (typeof window === 'undefined') return 'experiences';
+  const path = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  return PATH_TO_VIEW[path] || 'experiences';
+}
+
 export default function App() {
-  const [currentView, setCurrentView] = useState('experiences');
+  const [currentView, setCurrentViewState] = useState(getViewFromPath);
+
+  const setCurrentView = (target) => {
+    const viewId = PATH_TO_VIEW[target] || target;
+    const path = VIEW_TO_PATH[viewId] || (target.startsWith('/') ? target : `/${target}`);
+
+    if (window.location.pathname !== path) {
+      window.history.pushState({ view: viewId }, '', path);
+    }
+    setCurrentViewState(viewId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentViewState(getViewFromPath());
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // If initial landing was root '/', sync browser address bar to '/experiences'
+    if (window.location.pathname === '/' || !window.location.pathname) {
+      window.history.replaceState({ view: 'experiences' }, '', '/experiences');
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Wishlist / Favorites persisted in browser localStorage
   const [favorites, setFavorites] = useState(() => {

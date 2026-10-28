@@ -2,13 +2,13 @@ import React from 'react';
 
 export default function Navbar({ currentView, setCurrentView, onOpenTrip, tripCount = 0 }) {
   const views = [
-    { id: 'experiences', label: 'Experiences' },
-    { id: 'place-details', label: 'Place Details' },
-    { id: 'planner', label: 'Itinerary Planner' },
-    { id: 'generating', label: 'AI Synthesis' },
-    { id: 'itinerary', label: 'Smart Itinerary' },
-    { id: 'route_budget', label: 'Route & Budget' },
-    { id: 'contribute', label: 'Share a Gem' },
+    { id: 'experiences', path: '/experiences', label: 'Experiences' },
+    { id: 'place-details', path: '/place-details', label: 'Place Details' },
+    { id: 'planner', path: '/planner', label: 'Itinerary Planner' },
+    { id: 'generating', path: '/generating', label: 'AI Synthesis' },
+    { id: 'itinerary', path: '/itinerary', label: 'Smart Itinerary' },
+    { id: 'route_budget', path: '/route-budget', label: 'Route & Budget' },
+    { id: 'contribute', path: '/contribute', label: 'Share a Gem' },
   ];
 
   return (
@@ -16,9 +16,13 @@ export default function Navbar({ currentView, setCurrentView, onOpenTrip, tripCo
       <div className="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         
         {/* Brand */}
-        <div 
-          onClick={() => setCurrentView('planner')}
-          className="flex items-center gap-2.5 shrink-0 cursor-pointer"
+        <a 
+          href="/planner"
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentView('planner');
+          }}
+          className="flex items-center gap-2.5 shrink-0 cursor-pointer no-underline"
         >
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm">
             <span className="material-symbols-outlined text-[20px]">explore</span>
@@ -28,24 +32,28 @@ export default function Navbar({ currentView, setCurrentView, onOpenTrip, tripCo
               YatraSathi
             </span>
           </div>
-        </div>
+        </a>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1 overflow-x-auto">
           {views.map((v) => {
             const isActive = currentView === v.id;
             return (
-              <button
+              <a
                 key={v.id}
-                onClick={() => setCurrentView(v.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                href={v.path}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentView(v.id);
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap no-underline ${
                   isActive
                     ? 'bg-primary text-white shadow-sm'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                 }`}
               >
                 {v.label}
-              </button>
+              </a>
             );
           })}
         </nav>
@@ -67,18 +75,21 @@ export default function Navbar({ currentView, setCurrentView, onOpenTrip, tripCo
           </button>
 
           {/* Profile Button */}
-          <button
-            onClick={() => setCurrentView('profile')}
+          <a
+            href="/profile"
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrentView('profile');
+            }}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
               currentView === 'profile'
                 ? 'bg-primary text-white ring-2 ring-primary/30'
                 : 'bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40'
             }`}
             title="Profile & Moderation"
-            type="button"
           >
             <span className="material-symbols-outlined text-[18px]">person</span>
-          </button>
+          </a>
         </div>
 
       </div>
