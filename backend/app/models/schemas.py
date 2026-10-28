@@ -81,3 +81,29 @@ class ItineraryResponse(BaseModel):
     total_budget: float
     budget_breakdown: Dict[str, float]
     status: str = "success"
+
+
+class PaymentCheckoutRequest(BaseModel):
+    amount: float = Field(..., gt=0, description="Amount in INR to be charged")
+    trip_destination: str = Field(..., description="Destination associated with the trip")
+    customer_email: Optional[str] = Field(None, description="Contact email for checkout session")
+    customer_name: Optional[str] = Field(None, description="Customer name")
+    success_url: Optional[str] = None
+    cancel_url: Optional[str] = None
+
+class PaymentCheckoutResponse(BaseModel):
+    session_id: str
+    order_id: str
+    checkout_url: str
+    amount: float
+    currency: str
+    status: str
+
+class PaymentVerifyRequest(BaseModel):
+    session_id: str
+
+class PaymentVerifyResponse(BaseModel):
+    success: bool
+    session_id: str
+    status: str
+    transaction: Optional[Dict[str, Any]] = None
