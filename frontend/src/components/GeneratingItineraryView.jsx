@@ -50,7 +50,7 @@ export default function GeneratingItineraryView({ onNavigate }) {
                   <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-secondary-fixed-dim/30 text-secondary">
                     <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                   </span>
-                  <span className="font-label-lg text-label-lg tracking-wider uppercase text-secondary">TerraVenture Neural Synthesizer</span>
+                  <span className="font-label-lg text-label-lg tracking-wider uppercase text-secondary">YatraSathi Neural Synthesizer</span>
                 </div>
                 {/* Micro Waypoint Progress Track */}
                 <div className="flex items-center gap-2 md:gap-3 bg-surface-container-low px-4 py-2 rounded-full self-start sm:self-auto">
@@ -200,7 +200,7 @@ export default function GeneratingItineraryView({ onNavigate }) {
                     </div>
                     <p className="font-body-sm text-body-sm text-on-surface">
 
-                TerraVenture synchronizes with live sunset timings at                       <strong className="text-primary font-semibold">Monsoon Palace (5:45 PM)</strong>
+                YatraSathi synchronizes with live sunset timings at                       <strong className="text-primary font-semibold">Monsoon Palace (5:45 PM)</strong>
 . Your afternoon route will automatically front-load uphill transit to avoid ghat bottleneck traffic.
                                   </p>
                   </div>
