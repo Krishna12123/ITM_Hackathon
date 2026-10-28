@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function SmartItineraryView({ onNavigate }) {
-  const [activePlan] = useState(() => {
+  const [activePlan, setActivePlan] = useState(() => {
     try {
       const raw = localStorage.getItem('generated_smart_itinerary');
       return raw ? JSON.parse(raw) : null;
@@ -10,13 +11,60 @@ export default function SmartItineraryView({ onNavigate }) {
     }
   });
 
+  const [tripId] = useState(() => {
+    try {
+      const urlId = new URLSearchParams(window.location.search).get('id');
+      const storedPlan = localStorage.getItem('generated_smart_itinerary');
+      const parsedPlan = storedPlan ? JSON.parse(storedPlan) : null;
+      return urlId || localStorage.getItem('active_trip_id') || parsedPlan?.trip_id || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [isSyncedWithSupabase, setIsSyncedWithSupabase] = useState(() => {
+    return Boolean(activePlan?.supabase_synced || activePlan?.trip_id);
+  });
+
+  // Query Supabase directly on mount to load fresh remote itinerary
+  useEffect(() => {
+    if (!tripId) return;
+
+    let isMounted = true;
+    async function loadFromSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('trip_inputs')
+          .select('*')
+          .eq('id', tripId)
+          .single();
+
+        if (data && isMounted) {
+          const remotePlan = data.budget_breakdown?.generated_itinerary || data.generated_itinerary;
+          if (remotePlan) {
+            setActivePlan(remotePlan);
+            setIsSyncedWithSupabase(true);
+            try {
+              localStorage.setItem('generated_smart_itinerary', JSON.stringify(remotePlan));
+            } catch (e) {}
+          }
+        }
+      } catch (err) {
+        console.info('Supabase client fetch note:', err);
+      }
+    }
+
+    loadFromSupabase();
+    return () => { isMounted = false; };
+  }, [tripId]);
+
   const destinationName = activePlan?.destination || 'Udaipur, Rajasthan, India';
-  const durationDays = activePlan?.duration_days || 4;
-  const travelersCount = activePlan?.travelers || 2;
-  const paceName = activePlan?.travel_pace || 'Balanced';
-  const transitName = activePlan?.transit_mode || 'Auto / Walk';
-  const totalBudget = activePlan?.budget_ledger?.total_budget || 37000;
-  const perPersonSpend = activePlan?.budget_ledger?.per_person_spend || 18500;
+  const durationDays = activePlan?.duration_days || activePlan?.days || 4;
+  const travelersCount = activePlan?.travelers || activePlan?.guests || 2;
+  const paceName = activePlan?.travel_pace || activePlan?.selected_pace || 'Balanced';
+  const transitName = activePlan?.transit_mode || activePlan?.selected_transit || 'Auto / Walk';
+  const totalBudget = activePlan?.budget_ledger?.total_budget || activePlan?.total_budget || 37000;
+  const perPersonSpend = activePlan?.budget_ledger?.per_person_spend || activePlan?.spend_per_person || 18500;
   const activeDays = activePlan?.itinerary_days || [];
   return (
   <main className="w-full pt-20 bg-surface min-h-[calc(100vh-16rem)]">
@@ -29,15 +77,19 @@ export default function SmartItineraryView({ onNavigate }) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container font-label-md text-label-md text-primary font-semibold">
                   <span className="material-symbols-outlined text-[16px]">location_on</span>
-
-            Rajasthan, India
-                          </span>
+                  <span>Rajasthan, India</span>
+                </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint-light font-label-md text-label-md text-secondary font-semibold">
                   <span className="material-symbols-outlined text-[16px]">verified</span>
-
-            Curated Expedition
-                          </span>
-                <span className="text-outline font-label-md text-label-md">• Updated 12m ago</span>
+                  <span>Curated Expedition</span>
+                </span>
+                {isSyncedWithSupabase && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-md text-label-md font-semibold">
+                    <span className="material-symbols-outlined text-[16px] text-emerald-600">cloud_done</span>
+                    <span>Supabase Stored{tripId ? ` (${tripId.slice(0, 8)})` : ''}</span>
+                  </span>
+                )}
+                <span className="text-outline font-label-md text-label-md">• Updated Live</span>
               </div>
               <h1 className="font-headline-xl text-headline-xl text-clinical-navy tracking-tight">{destinationName}</h1>
               <div className="flex flex-wrap items-center gap-4 text-on-surface-variant font-body-sm text-body-sm">

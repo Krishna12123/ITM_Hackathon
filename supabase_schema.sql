@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS public.trip_inputs (
     selected_pace TEXT DEFAULT 'Balanced',
     transit_modes JSONB DEFAULT '["directions_walk", "local_taxi", "directions_bus", "two_wheeler"]'::jsonb,
     selected_transit TEXT DEFAULT 'local_taxi',
-    status TEXT DEFAULT 'active'
+    status TEXT DEFAULT 'active',
+    generated_itinerary JSONB DEFAULT NULL
 );
 
 -- Enable Row Level Security (RLS)
@@ -34,4 +35,8 @@ CREATE POLICY "Allow public insert to trip_inputs"
 
 CREATE POLICY "Allow public read from trip_inputs"
     ON public.trip_inputs FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow public update to trip_inputs"
+    ON public.trip_inputs FOR UPDATE
     USING (true);

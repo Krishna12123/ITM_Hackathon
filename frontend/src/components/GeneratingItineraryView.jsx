@@ -22,6 +22,19 @@ export default function GeneratingItineraryView({ onNavigate }) {
         const plan = await fetchItineraryPlan(params);
         if (plan) {
           localStorage.setItem('generated_smart_itinerary', JSON.stringify(plan));
+          if (plan.trip_id) {
+            localStorage.setItem('active_trip_id', plan.trip_id);
+          }
+          const tickerElem = document.getElementById('ticker-text');
+          if (tickerElem) tickerElem.textContent = "Synced with Supabase! Preparing smart itinerary...";
+          const percentElem = document.getElementById('percent-display');
+          if (percentElem) percentElem.textContent = "100%";
+          const progressFill = document.getElementById('progress-bar-fill');
+          if (progressFill) progressFill.style.width = "100%";
+
+          setTimeout(() => {
+            if (onNavigate) onNavigate('itinerary');
+          }, 1200);
         }
       } catch (err) {
         console.warn('ML Itinerary fetch background note:', err);
