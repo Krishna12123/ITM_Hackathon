@@ -38,3 +38,7 @@ ml_model/data/processed/*
 *.pt
 *.onnx
 .ipynb_checkpoints/
+
+*.db
+*.sqlite
+*.sqlite3

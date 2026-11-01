@@ -6,7 +6,6 @@ import {
   Sparkles,
   MapPin,
   Calendar,
-  Cpu,
   Route,
   PlusCircle,
   Heart,
@@ -16,9 +15,12 @@ import {
   Menu,
   X,
   ChevronRight,
-  CheckCircle2,
-  Clock
+  LogIn,
+  LogOut,
+  ShieldCheck,
+  ChevronDown
 } from 'lucide-react';
+import { getCurrentUser, signOutSession, hasAdminPrivileges } from '../services/authService';
 
 const NOTIFICATIONS = [
   {
@@ -42,18 +44,43 @@ export default function Navbar({
   setActiveTab,
   tripItems = [],
   favoritesCount = 0,
-  onOpenTrip
+  onOpenTrip,
+  onShowToast
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
   const notifRef = useRef(null);
+  const userMenuRef = useRef(null);
+
+  // Authentication state
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
+  const isAuthenticated = Boolean(currentUser);
+  const isAdmin = hasAdminPrivileges(currentUser);
+
+  // Listen to auth state broadcasts
+  useEffect(() => {
+    const handleAuthChange = (e) => {
+      if (e.detail) {
+        setCurrentUser(e.detail.user || null);
+      } else {
+        setCurrentUser(getCurrentUser());
+      }
+    };
+
+    window.addEventListener('yaatrasaathi_auth_change', handleAuthChange);
+    return () => window.removeEventListener('yaatrasaathi_auth_change', handleAuthChange);
+  }, []);
 
   // Close notifications popover on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setIsNotificationsOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setIsUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -75,6 +102,16 @@ export default function Navbar({
     setActiveTab(tabId);
     setIsMobileMenuOpen(false);
     setIsNotificationsOpen(false);
+    setIsUserMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await signOutSession();
+    setCurrentUser(null);
+    setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    if (onShowToast) onShowToast('Signed out successfully. Switched to guest mode.');
+    setActiveTab('home');
   };
 
   const unreadCount = notifications.filter((n) => n.unread).length;
@@ -109,23 +146,23 @@ export default function Navbar({
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#F36B21] group-hover:bg-[#D94E0B] flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 active:scale-95">
               <Compass className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] animate-profile-enter" />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="font-display font-extrabold text-lg sm:text-xl text-[#38291F] tracking-tight">
-                  Yaatra<span className="text-[#F36B21]">Saathi</span>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-black text-lg sm:text-xl text-[#38291F] tracking-tight group-hover:text-[#F36B21] transition-colors">
+                  YaatraSaathi
                 </span>
-                <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#F36B21]/10 text-[#F36B21] border border-[#F36B21]/20 hidden xs:inline-block">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-[#FFF8EF] text-[#D94E0B] border border-[#E7C9A5] rounded-full hidden sm:inline-block">
                   India
                 </span>
               </div>
-              <p className="text-[10px] sm:text-[11px] text-[#64748B] font-medium leading-none hidden sm:block">
+              <span className="text-[10px] font-medium text-[#64748B] hidden sm:block -mt-0.5 tracking-tight">
                 Community-Powered Tourism
-              </p>
+              </span>
             </div>
           </div>
 
           {/* =============================================================== */}
-          {/* 2. DESKTOP NAVIGATION (Clean, Horizontal & Well-Spaced)        */}
+          {/* 2. PRIMARY NAVIGATION LINKS (DESKTOP)                          */}
           {/* =============================================================== */}
           <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold">
             {primaryNavItems.map((item) => {
@@ -133,23 +170,6 @@ export default function Navbar({
               const isActive =
                 activeTab === item.id ||
                 (item.id === 'explore' && activeTab === 'state-details');
-
-              if (item.isPrimaryAction) {
-                return (
-                  <button
-                    key={item.id}
-                    onClick={item.action}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-200 active:scale-95 shadow-xs focus-visible:ring-2 focus-visible:ring-[#F36B21] focus-visible:outline-none ${
-                      isActive
-                        ? 'bg-[#D94E0B] text-white ring-2 ring-[#F36B21]/40'
-                        : 'bg-[#F36B21] text-white hover:bg-[#D94E0B]'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              }
 
               return (
                 <button
@@ -191,13 +211,13 @@ export default function Navbar({
           </nav>
 
           {/* =============================================================== */}
-          {/* 3. RIGHT UTILITIES: SAVED, NOTIFICATIONS, MY TRIP, PROFILE    */}
+          {/* 3. RIGHT UTILITIES: SAVED, NOTIFICATIONS, MY TRIP, AUTH/PROFILE */}
           {/* =============================================================== */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             
             {/* Saved Places Heart Trigger */}
             <button
-              onClick={() => handleNavClick('profile')}
+              onClick={() => handleNavClick(isAuthenticated ? 'profile' : 'login')}
               title={`Saved Places (${favoritesCount})`}
               className={`relative p-2 rounded-full transition-all duration-150 focus-visible:ring-2 focus-visible:ring-[#F36B21] focus-visible:outline-none ${
                 activeTab === 'profile'
@@ -252,21 +272,23 @@ export default function Navbar({
                     )}
                   </div>
 
-                  <div className="space-y-2.5">
+                  <div className="space-y-2.5 max-h-64 overflow-y-auto">
                     {notifications.map((n) => (
                       <div
                         key={n.id}
                         className={`p-2.5 rounded-xl border text-xs transition-colors ${
                           n.unread
-                            ? 'bg-[#FFF8EF] border-[#F2E4D2]'
+                            ? 'bg-[#FFF8EF] border-[#E7C9A5]/60'
                             : 'bg-white border-[#E5E7EB]'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-1 mb-1">
-                          <span className="font-bold text-[#38291F]">{n.title}</span>
-                          <span className="text-[10px] text-[#64748B]">{n.time}</span>
+                        <div className="flex items-center justify-between font-bold text-[#38291F]">
+                          <span>{n.title}</span>
+                          <span className="text-[10px] text-[#64748B] font-normal flex items-center gap-0.5">
+                            {n.time}
+                          </span>
                         </div>
-                        <p className="text-[11px] text-[#64748B] leading-relaxed">
+                        <p className="text-[11px] text-[#64748B] mt-1 leading-snug">
                           {n.desc}
                         </p>
                       </div>
@@ -297,19 +319,104 @@ export default function Navbar({
               )}
             </button>
 
-            {/* Profile / Account Trigger */}
-            <button
-              onClick={() => handleNavClick('profile')}
-              title="Profile & Role Dashboard"
-              className={`p-1.5 sm:p-2 rounded-full transition-all duration-150 border focus-visible:ring-2 focus-visible:ring-[#F36B21] focus-visible:outline-none ${
-                activeTab === 'profile'
-                  ? 'bg-[#F36B21] text-white border-[#F36B21] shadow-xs'
-                  : 'bg-white hover:bg-[#F7F8FC] text-[#38291F] border-[#E5E7EB] hover:border-[#F36B21]'
-              }`}
-              aria-label="User Profile"
-            >
-              <User className="w-4 h-4" />
-            </button>
+            {/* =========================================================== */}
+            {/* AUTHENTICATION INTEGRATION                                  */}
+            {/* =========================================================== */}
+            {!isAuthenticated ? (
+              /* BEFORE LOGIN: Show "Sign In" Option */
+              <button
+                onClick={() => handleNavClick('login')}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#D94E0B] to-[#F36B21] hover:from-[#c44307] hover:to-[#e05e19] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold shadow-xs hover:shadow transition-all duration-150 active:scale-95"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </button>
+            ) : (
+              /* AFTER LOGIN: Profile Pill + Dropdown with ADMIN Badge & Logout */
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                  className={`flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border transition-all duration-150 focus-visible:ring-2 focus-visible:ring-[#F36B21] ${
+                    isAdmin
+                      ? 'bg-amber-50/70 border-amber-300 hover:bg-amber-100/70'
+                      : 'bg-[#FFF8EF] border-[#E7C9A5] hover:bg-[#F2E4D2]'
+                  }`}
+                  aria-label="User account menu"
+                >
+                  <img
+                    src={
+                      currentUser.avatar ||
+                      (isAdmin
+                        ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80'
+                        : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80')
+                    }
+                    alt={currentUser.name}
+                    className="w-7 h-7 rounded-full object-cover border border-white shadow-xs shrink-0"
+                  />
+                  
+                  <div className="flex items-center gap-1.5 hidden md:flex">
+                    <span className="text-xs font-bold text-[#38291F] max-w-[100px] truncate">
+                      {currentUser.name.split(' ')[0]}
+                    </span>
+                    {isAdmin && (
+                      <span className="px-1.5 py-0.2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold text-[9px] uppercase tracking-wider rounded shadow-xs">
+                        Admin
+                      </span>
+                    )}
+                  </div>
+
+                  <ChevronDown className="w-3 h-3 text-[#64748B]" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] p-2 z-50 animate-scaleIn">
+                    {/* User Identity Header */}
+                    <div className="px-3 py-2 border-b border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-[#38291F] truncate">{currentUser.name}</p>
+                        {isAdmin && (
+                          <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 font-bold text-[9px] uppercase rounded">
+                            Admin
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-[#64748B] truncate mt-0.5">{currentUser.email}</p>
+                    </div>
+
+                    {/* Navigation Items */}
+                    <div className="py-1">
+                      <button
+                        onClick={() => handleNavClick('profile')}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#38291F] hover:bg-[#FFF8EF] hover:text-[#F36B21] rounded-xl transition-colors text-left"
+                      >
+                        {isAdmin ? <ShieldCheck className="w-4 h-4 text-amber-600" /> : <User className="w-4 h-4 text-[#F36B21]" />}
+                        <span>{isAdmin ? 'Admin Dashboard' : 'My Account & Saved'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleNavClick('contribute')}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#38291F] hover:bg-[#FFF8EF] hover:text-[#F36B21] rounded-xl transition-colors text-left"
+                      >
+                        <PlusCircle className="w-4 h-4 text-[#64748B]" />
+                        <span>Share a Gem</span>
+                      </button>
+                    </div>
+
+                    {/* Intuitive Logout Option */}
+                    <div className="pt-1 border-t border-gray-100">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left"
+                      >
+                        <LogOut className="w-4 h-4 text-red-500" />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Mobile / Tablet Menu Button Toggle */}
             <button
@@ -339,12 +446,14 @@ export default function Navbar({
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-[#F36B21]" />
                 <span className="text-xs font-bold text-[#38291F]">
-                  YaatraSaathi Explorer
+                  {currentUser ? (isAdmin ? 'Admin Portal Active' : `Hi, ${currentUser.name.split(' ')[0]}`) : 'YaatraSaathi Explorer'}
                 </span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#F36B21] border border-[#E7C9A5]/50">
-                {favoritesCount} Saved Places
-              </span>
+              {isAdmin && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  ADMIN
+                </span>
+              )}
             </div>
 
             {/* Navigation Links */}
@@ -376,21 +485,46 @@ export default function Navbar({
                 );
               })}
 
-              {/* Profile Shortcut */}
-              <button
-                onClick={() => handleNavClick('profile')}
-                className={`flex items-center justify-between w-full p-3 rounded-xl text-xs font-semibold transition-all duration-150 active:scale-[0.98] ${
-                  activeTab === 'profile'
-                    ? 'bg-[#FFF8EF] text-[#F36B21] font-bold border border-[#F2E4D2]'
-                    : 'bg-[#F7F8FC] text-[#38291F] hover:bg-white border border-[#E5E7EB]'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <User className="w-4 h-4 text-[#F36B21]" />
-                  <span>Profile & Admin Dashboard</span>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8]" />
-              </button>
+              {/* Profile or Sign-In in Mobile Drawer */}
+              {isAuthenticated ? (
+                <>
+                  <button
+                    onClick={() => handleNavClick('profile')}
+                    className={`flex items-center justify-between w-full p-3 rounded-xl text-xs font-semibold transition-all duration-150 active:scale-[0.98] ${
+                      activeTab === 'profile'
+                        ? 'bg-[#FFF8EF] text-[#F36B21] font-bold border border-[#F2E4D2]'
+                        : 'bg-[#F7F8FC] text-[#38291F] hover:bg-white border border-[#E5E7EB]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <User className="w-4 h-4 text-[#F36B21]" />
+                      <span>{isAdmin ? 'Admin Dashboard' : 'Profile & Saved'}</span>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-between w-full p-3 rounded-xl text-xs font-semibold text-red-600 bg-red-50 border border-red-200 transition-all duration-150"
+                  >
+                    <div className="flex items-center gap-3">
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>Log Out</span>
+                    </div>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => handleNavClick('login')}
+                  className="flex items-center justify-between w-full p-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#D94E0B] to-[#F36B21] shadow-xs"
+                >
+                  <div className="flex items-center gap-3">
+                    <LogIn className="w-4 h-4" />
+                    <span>Sign In to YaatraSaathi</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Bottom Community Footer info in drawer */}

@@ -7,6 +7,7 @@ import PlaceDetailsPage from './pages/PlaceDetailsPage';
 import ContributionFormPage from './pages/ContributionFormPage';
 import ProfilePage from './pages/ProfilePage';
 import StateDestinationPage from './pages/StateDestinationPage';
+import LoginPage from './pages/LoginPage';
 import TripPlannerView from './components/TripPlannerView';
 import GeneratingItineraryView from './components/GeneratingItineraryView';
 import SmartItineraryView from './components/SmartItineraryView';
@@ -139,6 +140,8 @@ export default function App() {
       window.history.pushState({ tab: 'contribute' }, '', '/contribute');
     } else if (targetTab === 'profile') {
       window.history.pushState({ tab: 'profile' }, '', '/profile');
+    } else if (targetTab === 'login') {
+      window.history.pushState({ tab: 'login' }, '', '/login');
     } else if (targetTab === 'planner') {
       window.history.pushState({ tab: 'planner' }, '', '/planner');
     } else if (targetTab === 'generating') {
@@ -211,6 +214,8 @@ export default function App() {
         setActiveTab('route_budget');
       } else if (path.startsWith('/contribute')) {
         setActiveTab('contribute');
+      } else if (path.startsWith('/login') || path.startsWith('/signin')) {
+        setActiveTab('login');
       } else if (path.startsWith('/profile')) {
         setActiveTab('profile');
       } else {
@@ -242,6 +247,7 @@ export default function App() {
         tripItems={tripItems}
         favoritesCount={favorites.length}
         onOpenTrip={() => setIsTripDrawerOpen(true)}
+        onShowToast={showToast}
       />
 
       {/* Dynamic View rendering assigned modules */}
@@ -314,6 +320,16 @@ export default function App() {
             onToggleTrip={handleToggleTrip}
             onNavigateToPlace={navigateToPlace}
             onNavigateToExperiences={navigateToExplore}
+            onNavigateToLogin={() => handleTabChange('login')}
+            onShowToast={showToast}
+          />
+        )}
+        {activeTab === 'login' && (
+          <LoginPage
+            onLoginSuccess={(user) => {
+              handleTabChange('profile');
+            }}
+            onNavigateToHome={navigateToHome}
             onShowToast={showToast}
           />
         )}

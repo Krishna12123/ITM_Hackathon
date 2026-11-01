@@ -31,7 +31,8 @@ import {
   Lock,
   Sliders,
   ShieldAlert,
-  Award
+  Award,
+  LogIn
 } from 'lucide-react';
 import { MOCK_DESTINATIONS, MOCK_EXPERIENCES } from '../data/mockData';
 import {
@@ -39,6 +40,7 @@ import {
   setActiveSessionRole,
   signOutSession,
   hasAdminPrivileges,
+  executeModerationDecision,
   DEFAULT_PROFILES
 } from '../services/authService';
 
@@ -136,6 +138,7 @@ export default function ProfilePage({
   onToggleTrip,
   onNavigateToPlace,
   onNavigateToExperiences,
+  onNavigateToLogin,
   onShowToast
 }) {
   // 1. Authenticated Session & Role State
@@ -179,7 +182,7 @@ export default function ProfilePage({
       const sessionData = await getAuthenticatedSession();
       if (sessionData && sessionData.user) {
         setAuthenticatedUser(sessionData.user);
-        const role = sessionData.user.role || 'user';
+        const role = (sessionData.user.role || 'user').toLowerCase();
         setUserRole(role);
         setSessionSource(sessionData.source || 'session_store');
         setEditForm({
@@ -190,23 +193,36 @@ export default function ProfilePage({
 
         // Set default tab based on detected role
         setActiveTab(role === 'admin' ? 'moderation' : 'contributions');
+      } else {
+        setAuthenticatedUser(null);
       }
     } catch (err) {
       console.warn('Failed to detect authenticated session:', err);
-      const fallback = DEFAULT_PROFILES.user;
-      setAuthenticatedUser(fallback);
-      setUserRole('user');
-      setActiveTab('contributions');
+      setAuthenticatedUser(null);
     } finally {
       // Gentle pause to show smooth skeleton entrance
       setTimeout(() => {
         setSessionLoading(false);
-      }, 260);
+      }, 200);
     }
   };
 
   useEffect(() => {
     loadSession();
+
+    const handleAuthChange = (e) => {
+      if (e.detail?.user) {
+        setAuthenticatedUser(e.detail.user);
+        const role = (e.detail.user.role || 'user').toLowerCase();
+        setUserRole(role);
+        setActiveTab(role === 'admin' ? 'moderation' : 'contributions');
+      } else {
+        setAuthenticatedUser(null);
+      }
+    };
+
+    window.addEventListener('yaatrasaathi_auth_change', handleAuthChange);
+    return () => window.removeEventListener('yaatrasaathi_auth_change', handleAuthChange);
   }, []);
 
   // Compute Saved Places based on shared `favorites`
@@ -282,17 +298,16 @@ export default function ProfilePage({
   // Sign out session
   const handleSignOut = async () => {
     await signOutSession();
-    const resetUser = DEFAULT_PROFILES.user;
-    setAuthenticatedUser(resetUser);
+    setAuthenticatedUser(null);
     setUserRole('user');
     setActiveTab('contributions');
     if (onShowToast) {
-      onShowToast('Signed out of session. Switched to guest explorer profile.');
+      onShowToast('Signed out of session. Switched to guest explorer.');
     }
   };
 
   // Handle Moderation Action (Strictly guarded by hasAdminPrivileges)
-  const handleExecuteModeration = () => {
+  const handleExecuteModeration = async () => {
     // 1. Independent authorization guard: reject non-admin callers
     if (!hasAdminPrivileges(authenticatedUser)) {
       if (onShowToast) {
@@ -312,30 +327,34 @@ export default function ProfilePage({
 
     setIsProcessingAction(true);
 
-    setTimeout(() => {
-      setIsProcessingAction(false);
-      let updatedStatus = 'Approved';
-      let toastMsg = `Approved "${item.title}" for community discovery!`;
+    try {
+      await executeModerationDecision(item.id, action, actionReason);
+    } catch (e) {
+      console.warn('Backend moderation action sync notice:', e);
+    }
 
-      if (action === 'request-changes') {
-        updatedStatus = 'Needs Changes';
-        toastMsg = `Feedback sent for "${item.title}". Status set to Needs Changes.`;
-      } else if (action === 'reject') {
-        updatedStatus = 'Rejected';
-        toastMsg = `Submission "${item.title}" rejected and archived in audit log.`;
-      }
+    let updatedStatus = 'Approved';
+    let toastMsg = `Approved "${item.title}" for community discovery!`;
 
-      setModerationQueue((prev) =>
-        prev.map((m) => (m.id === item.id ? { ...m, status: updatedStatus } : m))
-      );
+    if (action === 'request-changes') {
+      updatedStatus = 'Needs Changes';
+      toastMsg = `Feedback sent for "${item.title}". Status set to Needs Changes.`;
+    } else if (action === 'reject') {
+      updatedStatus = 'Rejected';
+      toastMsg = `Submission "${item.title}" rejected and archived in audit log.`;
+    }
 
-      setModerationActionModal(null);
-      setActionReason('');
+    setModerationQueue((prev) =>
+      prev.map((m) => (m.id === item.id ? { ...m, status: updatedStatus } : m))
+    );
 
-      if (onShowToast) {
-        onShowToast(toastMsg);
-      }
-    }, 400);
+    setIsProcessingAction(false);
+    setModerationActionModal(null);
+    setActionReason('');
+
+    if (onShowToast) {
+      onShowToast(toastMsg);
+    }
   };
 
   // --------------------------------------------------------------------------
@@ -387,6 +406,39 @@ export default function ProfilePage({
             ))}
           </div>
         </main>
+      </div>
+    );
+  }
+
+  if (!authenticatedUser) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center py-16 px-4 bg-[#FFF8EF]">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#E7C9A5] shadow-xl text-center animate-fadeIn">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#D94E0B] to-[#F36B21] text-white mx-auto flex items-center justify-center mb-4 shadow-md shadow-[#F36B21]/30">
+            <User className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-display font-extrabold text-[#38291F]">
+            Sign In to YaatraSaathi
+          </h2>
+          <p className="mt-2 text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Please log in with Google to view your saved places and contributions, or sign in to the Admin Portal to moderate community discoveries.
+          </p>
+          <div className="mt-6 flex flex-col gap-3">
+            <button
+              onClick={onNavigateToLogin}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-[#D94E0B] to-[#F36B21] hover:from-[#c44307] hover:to-[#e05e19] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Sign In Now</span>
+            </button>
+            <button
+              onClick={onNavigateToExperiences}
+              className="text-xs font-semibold text-[#64748B] hover:text-[#F36B21] py-1.5 transition-colors"
+            >
+              Continue exploring as guest →
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
