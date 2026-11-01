@@ -181,12 +181,12 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-canvas font-sans text-slate-900">
+    <div className="min-h-screen flex flex-col bg-[#FFF8EF] font-sans text-[#38291F]">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-4 sm:right-8 z-50 animate-slideDown">
-          <div className="bg-slate-900 text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-lg shadow-level-3 border border-slate-700 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+          <div className="bg-[#38291F] text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-lg shadow-level-3 border border-[#38291F]/40 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#F36B21] shrink-0" />
             <span>{toastMessage}</span>
           </div>
         </div>
@@ -233,6 +233,7 @@ export default function App() {
               window.history.pushState({ tab: 'place-details' }, '', '/place-details');
             }}
             onNavigateToState={navigateToState}
+            onNavigate={handleTabChange}
           />
         )}
         {activeTab === 'place-details' && (

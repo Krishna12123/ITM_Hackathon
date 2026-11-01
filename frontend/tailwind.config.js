@@ -8,17 +8,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        // YatraSaathi Standardized Indian Tourism Palette
+        // YaatraSaathi Modern Indian Community Tourism Palette
         "primary": {
-          DEFAULT: "#F45B0B",
-          hover: "#C94708",
-          light: "#FFF9F1",
-          container: "#F45B0B",
-          tint: "#FED7AA",
-          fixed: "#FED7AA",
-          "fixed-dim": "#FDBA74",
+          DEFAULT: "#F36B21",
+          hover: "#D94E0B",
+          light: "#FFF8EF",
+          container: "#F36B21",
+          tint: "#E7C9A5",
+          fixed: "#F2E4D2",
+          "fixed-dim": "#E7C9A5",
         },
-        "burnt-orange": "#C94708",
+        "deep-orange": "#D94E0B",
+        "cream": "#FFF8EF",
+        "warm-beige": "#F2E4D2",
+        "sand": "#E7C9A5",
+        "dark-brown": "#38291F",
+        "burnt-orange": "#D94E0B",
         "gold-accent": "#F4B942",
         "teal-deep": "#155E63",
         "on-primary": "#ffffff",

@@ -9,8 +9,8 @@
   }
   body {
     overscroll-behavior: none;
-    background-color: #F7F8FC;
-    color: #172033;
+    background-color: #FFF8EF;
+    color: #38291F;
     font-family: 'Inter', sans-serif;
   }
   main > :first-child {

@@ -719,7 +719,7 @@ export default function TripPlannerView({ onNavigate }) {
                   {/* Topographic & Itinerary Feature Highlights */}
                   <div className="space-y-3">
                     <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">
-                      SSM Engine Inclusions
+                      YaatraSaathi Engine Inclusions
                     </span>
                     <ul className="space-y-3">
                       <li className="flex items-start gap-3 font-body-sm text-body-sm">
