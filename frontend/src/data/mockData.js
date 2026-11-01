@@ -85,6 +85,83 @@ export const STATE_THEMES = [
     badge: "Nature & Traditions",
     stats: "3 Nature Trails • 8 Experiences"
   }
+,
+  {
+    id: "kerala",
+    name: "Kerala",
+    subheading: "Backwaters & Spice Coast",
+    tagline: "Lush Canals, Spice Valleys & Living Folklore",
+    featuredDestination: "Alleppey Backwaters & Vembanad Lake",
+    description: "Glide through serene palm-fringed lagoons, savor spiced sadhya feasts served on banana leaves, and witness Kathakali theater.",
+    image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1200&q=80",
+    destinationId: "alleppey-backwaters",
+    palette: {
+      primary: "#0E6251",
+      accent: "#E59866",
+      bgSubtle: "#E8F8F5",
+      dark: "#145A32"
+    },
+    badge: "God's Own Country",
+    stats: "4 Water Circuits • 12 Experiences"
+  },
+  {
+    id: "himachal-pradesh",
+    name: "Himachal Pradesh",
+    subheading: "Himalayan Sanctuary",
+    tagline: "Snow-Crested Valleys, Ancient Monasteries & Alpine Orchards",
+    featuredDestination: "Spiti Valley & Key Monastery",
+    description: "Trek pristine cedar pathways, discover cliffside Buddhist monasteries in Spiti, and stay in rustic cedar-wood mountain homestays.",
+    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1200&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=1200&q=80",
+    destinationId: "spiti-valley",
+    palette: {
+      primary: "#1F618D",
+      accent: "#F39C12",
+      bgSubtle: "#EBF5FB",
+      dark: "#1B4F72"
+    },
+    badge: "Himalayan Sanctuary",
+    stats: "4 Mountain Trails • 11 Experiences"
+  },
+  {
+    id: "madhya-pradesh",
+    name: "Madhya Pradesh",
+    subheading: "Heart of Heritage",
+    tagline: "Storied Cenotaphs, Ancient Stone Carvings & River Sanctuaries",
+    featuredDestination: "Orchha Chhattris & Betwa River Sanctuary",
+    description: "Marvel at medieval Bundela palaces in Orchha, UNESCO stone temples in Khajuraho, and pristine river wildlife corridors.",
+    image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=1200&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80",
+    destinationId: "orchha-heritage",
+    palette: {
+      primary: "#7D6608",
+      accent: "#D4AC0D",
+      bgSubtle: "#FEF9E7",
+      dark: "#4A235A"
+    },
+    badge: "Heart of Heritage",
+    stats: "3 Heritage Circuits • 9 Experiences"
+  },
+  {
+    id: "goa",
+    name: "Goa",
+    subheading: "Coastal Heritage & Latin Quarters",
+    tagline: "Golden Coasts, Portuguese Cathedrals & Spice Plantations",
+    featuredDestination: "Old Goa UNESCO Basilica & Fontainhas",
+    description: "Explore vibrant pastel-washed Latin streets in Fontainhas, centuries-old colonial cathedrals, and organic spice plantation tours.",
+    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+    destinationId: "old-goa",
+    palette: {
+      primary: "#9C640C",
+      accent: "#D94E0B",
+      bgSubtle: "#FDFEFE",
+      dark: "#2C3E50"
+    },
+    badge: "Coastal Heritage",
+    stats: "3 Coastal Circuits • 8 Experiences"
+  }
 ];
 
 export const STATE_SPECIALITIES = [
@@ -408,6 +485,327 @@ export const STATE_SPECIALITIES = [
       ]
     }
   }
+,
+  {
+    stateId: "kerala",
+    name: "Kerala",
+    title: "Kerala — God's Own Country",
+    subtitle: "Lush Canals, Spice Valleys & Living Folklore",
+    introduction: "Discover the lush tropical coast where emerald lagoons weave through palm canopies, Kathakali artists paint their faces in vibrant earth minerals, and multi-dish banana leaf sadhyas celebrate ancestral culinary wisdom.",
+    bannerImage: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1600&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1600&q=80",
+    theme: {
+      primary: "#0E6251",
+      accent: "#E59866",
+      bgSubtle: "#E8F8F5",
+      dark: "#145A32",
+      badgeBg: "rgba(14, 98, 81, 0.9)"
+    },
+    actionLabel: "Explore Kerala",
+    categories: ["Local Food", "Folk Culture", "Handicrafts", "Places and Heritage"],
+    specialities: [
+      {
+        id: "ker-food",
+        category: "Local Food",
+        title: "Coastal Malabar & Travancore Cuisine",
+        items: ["Karimeen Pollichathu", "Appam with Stew", "Banana Leaf Sadhya"],
+        description: "Pearl spot fish wrapped in banana leaves with shallots and kokum, fluffy rice hopper appams with coconut vegetable stew, and festive 24-dish vegetarian feasts.",
+        image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-ker-sadhya",
+        filterCategory: "Local Food"
+      },
+      {
+        id: "ker-folk",
+        category: "Folk Culture",
+        title: "Temple Theatrics & Ritual Art",
+        items: ["Kathakali theater", "Theyyam divine dance", "Mohiniyattam"],
+        description: "Mesmerizing green-painted Paccha heroes performing epic dramas, trance-inducing Theyyam ritual shrines in sacred groves, and graceful Mohiniyattam swaying.",
+        image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-ker-kathakali",
+        filterCategory: "Folk Dance & Music"
+      },
+      {
+        id: "ker-crafts",
+        category: "Handicrafts",
+        title: "Artisan Coir & Metal Guilds",
+        items: ["Aranmula metal mirrors", "Golden coir weaving", "Coconut shell carvings"],
+        description: "World-famous reflective alloy mirrors cast through secret family metallurgy in Aranmula, and hand-spun coconut fiber ropes and rugs.",
+        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-ker-coir",
+        filterCategory: "Handicrafts & Workshops"
+      },
+      {
+        id: "ker-places",
+        category: "Places and Heritage",
+        title: "Backwaters & Hill Valleys",
+        items: ["Alleppey Canals", "Munnar Tea Hills", "Fort Kochi Jewish Town"],
+        description: "Silent canoe waterways across Kuttanad, tea-scented mountain crests in Munnar, and 16th-century Portuguese and Dutch spice warehouses in Fort Kochi.",
+        image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80",
+        actionType: "place",
+        targetId: "alleppey-backwaters",
+        filterCategory: "Heritage & Cultural Walks"
+      }
+    ],
+    natureAdventure: {
+      title: "Silent Valley & Periyar Forest Corridors",
+      description: "Bamboo rafting across Periyar tiger reserve lakes, night forest canopy walks, and guided spice garden explorations.",
+      items: ["Periyar Lake Bamboo Rafting", "Wayanad Cave & Waterfall Trek", "Kumarakom Bird Sanctuary Kayak"],
+      image: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80"
+    },
+    travelInfo: {
+      bestTimeToVisit: "September to March (Pleasant weather, backwater festivals, clear mountain trails)",
+      weather: "Warm and tropical (22°C - 32°C) with gentle sea breezes",
+      connectivity: "Cochin International (COK), Trivandrum (TRV), Calicut (CCJ); Ernakulam & Alleppey railway stations.",
+      travelTips: [
+        "Opt for small country canoes over large diesel houseboats to explore narrow, unspoiled village canals.",
+        "Attend an early evening Kathakali make-up session to see facial dyes applied by hand.",
+        "Drink fresh tender coconut water directly from canal-side farm stalls."
+      ]
+    }
+  },
+  {
+    stateId: "himachal-pradesh",
+    name: "Himachal Pradesh",
+    title: "Himachal Pradesh — Himalayan Sanctuary",
+    subtitle: "Snow-Crested Valleys, Ancient Monasteries & Alpine Orchards",
+    introduction: "Ascend into the majestic realm of deodar forests, cold desert moonscapes in Spiti, cliffside Buddhist gompas, and warm wooden kath-kuni architecture where oral folklore has survived millennia.",
+    bannerImage: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1600&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=1600&q=80",
+    theme: {
+      primary: "#1F618D",
+      accent: "#F39C12",
+      bgSubtle: "#EBF5FB",
+      dark: "#1B4F72",
+      badgeBg: "rgba(31, 97, 141, 0.9)"
+    },
+    actionLabel: "Explore Himachal Pradesh",
+    categories: ["Local Food", "Folk Culture", "Handicrafts", "Places and Heritage"],
+    specialities: [
+      {
+        id: "hp-food",
+        category: "Local Food",
+        title: "Traditional Pahadi & Himachali Dham",
+        items: ["Himachali Siddu with Ghee", "Chana Madra", "Babru"],
+        description: "Steamed fermented wheat dumplings stuffed with spiced poppy seeds and drizzled with mountain ghee, and slow-cooked yogurt chickpea Madra.",
+        image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-hp-siddu",
+        filterCategory: "Local Food"
+      },
+      {
+        id: "hp-folk",
+        category: "Folk Culture",
+        title: "Highland Folk Ballads & Masked Dances",
+        items: ["Kullu Nati Dance", "Spiti Cham Dances", "Dussehra Celebrations"],
+        description: "Guinness-record communal circle Nati dances in woollen embroidered caps, and sacred masked monastic Cham rituals warding off negative energies.",
+        image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-hp-nati",
+        filterCategory: "Folk Dance & Music"
+      },
+      {
+        id: "hp-crafts",
+        category: "Handicrafts",
+        title: "Alpine Weaving & Metal Craft",
+        items: ["Kullu handwoven shawls", "Chamba Rumal embroidery", "Tibetan Thangkas"],
+        description: "Geometric border Pashmina and Angora shawls woven on pit looms, double-sided silk satin-stitch handkerchiefs, and mineral-pigment thangka scrolls.",
+        image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-hp-weaving",
+        filterCategory: "Handicrafts & Workshops"
+      },
+      {
+        id: "hp-places",
+        category: "Places and Heritage",
+        title: "Gompas, Passages & Valleys",
+        items: ["Key Monastery Spiti", "Chandratal Lake", "Naggar Castle"],
+        description: "Thousand-year-old cliff fortress monastery at 4,166m, the crescent-shaped turquoise waters of Moon Lake, and wood-and-stone Himalayan castles.",
+        image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
+        actionType: "place",
+        targetId: "spiti-valley",
+        filterCategory: "Heritage & Cultural Walks"
+      }
+    ],
+    natureAdventure: {
+      title: "High Altitude Passes & Cedar Trails",
+      description: "Traverse high Himalayan passes, camp beside glacial lakes, and hike through virgin deodar cedar forests.",
+      items: ["Hampta Pass Trek", "Pin Valley National Park Snow Leopard Trail", "Tirthan Valley River Trout Walk"],
+      image: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80"
+    },
+    travelInfo: {
+      bestTimeToVisit: "April to June (Spring blooming & cool days) and September to November (Clear autumn mountain panoramas)",
+      weather: "Alpine mountain climate (5°C to 22°C in summer, sub-zero winters)",
+      connectivity: "Bhuntar/Kullu Airport (KUU), Kangra/Dharamshala Airport (DHM); Kalka-Shimla toy train.",
+      travelTips: [
+        "Acclimatize for at least 24 hours when traveling above 3,000 meters in Spiti or Kinnaur.",
+        "Stay in community-run wooden homestays to support local village economies directly.",
+        "Carry thermal layers even during summer months for sudden evening temperature drops."
+      ]
+    }
+  },
+  {
+    stateId: "madhya-pradesh",
+    name: "Madhya Pradesh",
+    title: "Madhya Pradesh — Heart of Heritage",
+    subtitle: "Storied Cenotaphs, Ancient Stone Carvings & River Sanctuaries",
+    introduction: "Journey to the cultural heartland where Bundela fortresses soar above the Betwa river, Khajuraho's sculpted temples capture celestial harmony, and ancient tribal guilds celebrate Gond and Dhokra folk art.",
+    bannerImage: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=1600&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1600&q=80",
+    theme: {
+      primary: "#7D6608",
+      accent: "#D4AC0D",
+      bgSubtle: "#FEF9E7",
+      dark: "#4A235A",
+      badgeBg: "rgba(125, 102, 8, 0.9)"
+    },
+    actionLabel: "Explore Madhya Pradesh",
+    categories: ["Local Food", "Folk Culture", "Handicrafts", "Places and Heritage"],
+    specialities: [
+      {
+        id: "mp-food",
+        category: "Local Food",
+        title: "Heartland Bundeli & Malwa Cuisine",
+        items: ["Bundelkhandi Bafla", "Bhutte ka Kees", "Poha Jalebi"],
+        description: "Ghee-soaked roasted wheat balls with spicy lentil gravy, grated spiced sweetcorn cooked in milk and mustard seeds, and crisp saffron jalebis.",
+        image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-food-walk",
+        filterCategory: "Local Food"
+      },
+      {
+        id: "mp-folk",
+        category: "Folk Culture",
+        title: "Tribal Lore & Bundela Ballads",
+        items: ["Gond Folklore Circle", "Rai Dance", "Betwa Evening Aarti"],
+        description: "Vibrant storytelling through sacred Gond animist ballads, the energetic percussion of Bundelkhand Rai, and lamps floating down Betwa rapids.",
+        image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-folk-music",
+        filterCategory: "Folk Dance & Music"
+      },
+      {
+        id: "mp-crafts",
+        category: "Handicrafts",
+        title: "Heirloom Weaving & Metal Casting",
+        items: ["Chanderi silk weaves", "Gond tribal art", "Dhokra bell metal"],
+        description: "Sheer gold-zari bordered Chanderi sarees, fine-line pointillist Gond canvas paintings, and 4,000-year-old lost-wax bell metal figurines.",
+        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-pottery",
+        filterCategory: "Handicrafts & Workshops"
+      },
+      {
+        id: "mp-places",
+        category: "Places and Heritage",
+        title: "Cenotaphs & Temple Splendor",
+        items: ["Orchha Chhattris", "Khajuraho Western Temples", "Gwalior Fort"],
+        description: "Fourteen monumental cenotaphs lining the rocky Betwa shore, intricate celestial carvings of Kandariya Mahadeva, and Gwalior sandstone bastions.",
+        image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+        actionType: "place",
+        targetId: "orchha-heritage",
+        filterCategory: "Heritage & Cultural Walks"
+      }
+    ],
+    natureAdventure: {
+      title: "River Canyons & Sal Forests",
+      description: "Spot vultures nesting in medieval cenotaph spires, kayak along Betwa rapids, and explore pristine Sal tiger reserves in Bandhavgarh and Kanha.",
+      items: ["Betwa Rapids Kayaking", "Panna National Park Safari", "Bhedaghat Marble Rocks Boat Ride"],
+      image: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80"
+    },
+    travelInfo: {
+      bestTimeToVisit: "October to March (Crisp sunny days: 15°C – 28°C)",
+      weather: "Dry continental climate with pleasant winter sunshine",
+      connectivity: "Khajuraho Airport (HJR), Bhopal (BHO), Gwalior (GWL); Jhansi railway junction (18 km from Orchha).",
+      travelTips: [
+        "Take an early morning cycling tour around the Orchha nature sanctuary along the Betwa river.",
+        "Hire licensed local community guides in Khajuraho to understand the allegorical philosophy behind temple iconography.",
+        "Visit local artisan clusters in Chanderi to purchase directly from weaver cooperatives."
+      ]
+    }
+  },
+  {
+    stateId: "goa",
+    name: "Goa",
+    title: "Goa — Coastal Heritage & Latin Quarters",
+    subtitle: "Golden Coasts, Portuguese Cathedrals & Spice Plantations",
+    introduction: "Beyond crowded shores lies authentic Goa: pastel-washed terracotta houses with oyster-shell windows in Fontainhas, ancient river islands, Portuguese baroque cathedrals, and generational spice plantations.",
+    bannerImage: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1600&q=80",
+    fallbackImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+    theme: {
+      primary: "#9C640C",
+      accent: "#D94E0B",
+      bgSubtle: "#FDFEFE",
+      dark: "#2C3E50",
+      badgeBg: "rgba(156, 100, 12, 0.9)"
+    },
+    actionLabel: "Explore Goa",
+    categories: ["Local Food", "Folk Culture", "Handicrafts", "Places and Heritage"],
+    specialities: [
+      {
+        id: "goa-food",
+        category: "Local Food",
+        title: "Indo-Portuguese & Saraswat Cuisine",
+        items: ["Goan Fish Curry Thali", "Poi with Chorizo", "Bebinca"],
+        description: "Tangy coconut-kokum fish curry served with red unpolished rice, crusty earthen-oven poi bread, and seven-layered spiced coconut egg pudding.",
+        image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-goa-food",
+        filterCategory: "Local Food"
+      },
+      {
+        id: "goa-folk",
+        category: "Folk Culture",
+        title: "Coastal Folk Melodies & Shrines",
+        items: ["Mando & Dulpod singing", "Dekhnni folk dance", "Shigmo Spring Festival"],
+        description: "Violin and ghumot-accompanied Mando romantic songs, brass lantern dances, and vibrant temple processions through hinterland villages.",
+        image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-goa-music",
+        filterCategory: "Folk Dance & Music"
+      },
+      {
+        id: "goa-crafts",
+        category: "Handicrafts",
+        title: "Azulejos & Coconut Fiber Arts",
+        items: ["Hand-painted Azulejo tiles", "Terracotta pottery of Bicholim", "Crochet lace"],
+        description: "Classic blue-and-yellow tin-glazed ceramic tiles hand-painted by local masters, and delicate convent-style crochet lace.",
+        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+        actionType: "experience",
+        targetId: "exp-goa-tiles",
+        filterCategory: "Handicrafts & Workshops"
+      },
+      {
+        id: "goa-places",
+        category: "Places and Heritage",
+        title: "Baroque Heritage & Latin Quarters",
+        items: ["Basilica of Bom Jesus", "Fontainhas Latin Quarter", "Divar River Island"],
+        description: "UNESCO 16th-century jesuit basilica holding the relics of St. Francis Xavier, Portuguese colonial houses, and peaceful mangrove river ferries.",
+        image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+        actionType: "place",
+        targetId: "old-goa",
+        filterCategory: "Heritage & Cultural Walks"
+      }
+    ],
+    natureAdventure: {
+      title: "Mandovi Estuary & Spice Hills",
+      description: "Cruise calm mangrove waters spotting backwater kingfishers and otters, or hike through fragrant vanilla and nutmeg plantations.",
+      items: ["Dr. Salim Ali Bird Sanctuary Kayaking", "Sahakari Spice Plantation Trail", "Dudhsagar Waterfall Jeep Trek"],
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+    },
+    travelInfo: {
+      bestTimeToVisit: "November to February (Sunny, breezy, minimal humidity: 22°C – 30°C)",
+      weather: "Pleasant coastal climate with balmy evening breezes",
+      connectivity: "Manohar International Airport, Mopa (GOX), Dabolim Airport (GOI); Madgaon & Thivim railway stations.",
+      travelTips: [
+        "Take the local public ferry to Divar or Chorão Island for peaceful cycling through Portuguese villages.",
+        "Explore Fontainhas on foot during early morning when sunlight illuminates the ochre and cobalt walls.",
+        "Visit organic spice plantations for home-cooked Saraswat lunches prepared with fresh garden spices."
+      ]
+    }
+  }
 ];
 
 export const MOCK_DESTINATIONS = [
@@ -597,9 +995,334 @@ export const MOCK_DESTINATIONS = [
     },
     relatedExperiences: ["exp-food-walk", "exp-folk-music", "exp-pottery", "exp-nature-walk"]
   }
+,
+  {
+    id: "alleppey-backwaters",
+    name: "Alleppey Backwaters & Vembanad Lagoon",
+    state: "Kerala",
+    stateId: "kerala",
+    location: "Alappuzha, Kerala, India",
+    rating: 4.95,
+    reviewsCount: 480,
+    verifiedStatus: "National Geographic Paradise Locus",
+    tagline: "Serene palm-fringed waterways, rustic canoe trails, and coir craft villages",
+    heroImage: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80"
+    ],
+    overview: "Alleppey, dubbed the Venice of the East, is a labyrinth of emerald lagoons, canals, and coconut groves stretching along Vembanad Lake. Home to generations of coir weavers and canoe fishermen, life here flows gently with the rhythm of the tides.",
+    highlights: [
+      "Pristine canoe paddling through narrow village canals inaccessible to houseboats.",
+      "Organic coir fiber spinning and traditional Kerala boat building workshops.",
+      "Sunset reflections over Vembanad Lake with flocks of migratory teals.",
+      "Authentic banana-leaf sadhya prepared with native garden spices and red rice."
+    ],
+    travelTips: [
+      "Hire small hand-rowed shikaras or country canoes for minimal ecological disturbance.",
+      "Morning sunrise canoe trips offer the clearest birdwatching and mirror-like water reflections."
+    ],
+    openingHours: "Open Daily (Boat trails: 06:00 AM – 06:30 PM)",
+    entryFee: "Free access to public canals / Guided country boat tours ₹600 – ₹1,200",
+    bestVisitingTime: "September to March (Pleasant breezes: 22°C – 30°C)",
+    mapCoordinates: {
+      lat: 9.4981,
+      lng: 76.3388,
+      elevation: "1m above sea level",
+      nearestTransit: "Cochin International Airport (82 km) / Alappuzha Railway Station (4 km)"
+    },
+    relatedExperiences: ["exp-ker-sadhya", "exp-ker-kathakali", "exp-ker-coir"]
+  },
+  {
+    id: "spiti-valley",
+    name: "Spiti Valley & Key Monastic Fortress",
+    state: "Himachal Pradesh",
+    stateId: "himachal-pradesh",
+    location: "Kaza, Spiti Valley, Himachal Pradesh, India",
+    rating: 4.97,
+    reviewsCount: 310,
+    verifiedStatus: "High Altitude Himalayan Biosphere",
+    tagline: "Cliffside Tibetan monasteries, lunar riverbeds, and sacred high mountain trails",
+    heroImage: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80"
+    ],
+    overview: "Spiti, the 'Middle Land' between India and Tibet, is a breathtaking cold-desert sanctuary enclosed by towering 6,000-meter peaks. Perched on a conical hill overlooking the Spiti River, Key Gompa stands as a thousand-year-old living center of Gelugpa Buddhist learning.",
+    highlights: [
+      "Key Monastery thousand-year prayer halls with ancient murals, thangkas, and horns.",
+      "Highest inhabited villages on earth (Kibber, Komic, and Langza fossil valley).",
+      "Pristine turquoise waters of high-altitude Chandratal (Moon Lake).",
+      "Stargazing under Bortle-1 night skies with crystal-clear Milky Way visibility."
+    ],
+    travelTips: [
+      "Acclimatize in Kaza for at least 36 hours before hiking to high altitude passes.",
+      "Dress in warm layers; temperatures dip dramatically after sundown even in summer."
+    ],
+    openingHours: "Key Monastery: 06:00 AM – 06:00 PM (Daily)",
+    entryFee: "Free entry / Voluntary donation to monastery school",
+    bestVisitingTime: "June to September (Passes clear of snow: 10°C – 22°C)",
+    mapCoordinates: {
+      lat: 32.2974,
+      lng: 78.0125,
+      elevation: "4,166m above sea level",
+      nearestTransit: "Bhuntar/Kullu Airport (245 km via Rohtang & Kunzum Pass)"
+    },
+    relatedExperiences: ["exp-hp-siddu", "exp-hp-nati", "exp-hp-weaving"]
+  },
+  {
+    id: "old-goa",
+    name: "Old Goa UNESCO Basilica & Latin Enclave",
+    state: "Goa",
+    stateId: "goa",
+    location: "Velha Goa & Panaji, Goa, India",
+    rating: 4.89,
+    reviewsCount: 395,
+    verifiedStatus: "UNESCO World Heritage Site",
+    tagline: "Centuries-old baroque cathedrals, Portuguese azulejo tiles, and pastel Latin alleys",
+    heroImage: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+    ],
+    overview: "Once the grand capital of Portuguese India, Old Goa boasts some of the most spectacular baroque churches in Asia, including the Basilica of Bom Jesus and Se Cathedral. Just across the river, Fontainhas in Panaji preserves narrow cobblestone streets, tile rooflines, and vibrant pastel facades.",
+    highlights: [
+      "Basilica of Bom Jesus — 16th-century Jesuit marvel with gilded altars.",
+      "Fontainhas heritage walking trail admiring azulejo tile plaques and wooden balconies.",
+      "Traditional bakery visits sampling fresh poi bread and bebinca pudding.",
+      "Divar Island ferry and cycling through ancestral river communities."
+    ],
+    travelTips: [
+      "Visit early in the morning before midday tour groups arrive.",
+      "Dress respectfully when entering cathedral sanctuaries (shoulders and knees covered)."
+    ],
+    openingHours: "09:00 AM – 06:30 PM (Sundays: 10:30 AM – 06:30 PM)",
+    entryFee: "Free entry / Museum ₹25",
+    bestVisitingTime: "November to March (Pleasant coastal breezes: 22°C – 30°C)",
+    mapCoordinates: {
+      lat: 15.5009,
+      lng: 73.9116,
+      elevation: "15m above sea level",
+      nearestTransit: "Manohar International Airport, Mopa (32 km) / Karmali Railway Station (3 km)"
+    },
+    relatedExperiences: ["exp-goa-food", "exp-goa-music", "exp-goa-tiles"]
+  }
 ];
 
 export const MOCK_EXPERIENCES = [
+  // --- KERALA EXPERIENCES ---
+  {
+    id: "exp-ker-sadhya",
+    title: "Organic Banana-Leaf Sadhya Feast & Hearth Cooking",
+    category: "Local Food",
+    state: "Kerala",
+    stateId: "kerala",
+    location: "Kuttanad Canal Farm, Alleppey, Kerala",
+    rating: 4.96,
+    reviewsCount: 142,
+    duration: "3.5 Hours",
+    price: 950,
+    priceNote: "per guest",
+    highlights: ["24-dish traditional feast", "Handmade coconut milk extraction", "Cooked with family farm produce"],
+    host: {
+      name: "Parvathi & Unnikrishnan Nair",
+      role: "Generational Spice Farmers",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+      rating: 4.98
+    },
+    image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+    badge: "Heritage Hearth",
+    shortDescription: "Learn to temper coconut oil, mustard seeds, and curry leaves for authentic avial, sambar, and payasam served on fresh banana leaves."
+  },
+  {
+    id: "exp-ker-kathakali",
+    title: "Temple Kathakali Recital & Mineral Pigment Makeup",
+    category: "Folk Dance & Music",
+    state: "Kerala",
+    stateId: "kerala",
+    location: "Fort Kochi Heritage Stage, Kochi, Kerala",
+    rating: 4.93,
+    reviewsCount: 178,
+    duration: "2.5 Hours",
+    price: 1100,
+    priceNote: "per guest",
+    highlights: ["Watch 2-hour natural makeup process", "Demonstration of 9 facial rasas", "Full dramatic recital"],
+    host: {
+      name: "Guru Madhavan Asan",
+      role: "Master Kathakali Performer",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      rating: 4.97
+    },
+    image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
+    badge: "Temple Tradition",
+    shortDescription: "Witness the sacred transformational art of Kathakali, from natural stone facial pigments to the dramatic mudras of Mahabharata legends."
+  },
+  {
+    id: "exp-ker-coir",
+    title: "Golden Coir Weaving & Aranmula Metal Mirror Studio",
+    category: "Handicrafts & Workshops",
+    state: "Kerala",
+    stateId: "kerala",
+    location: "Muhamma Artisan Guild, Alleppey, Kerala",
+    rating: 4.88,
+    reviewsCount: 88,
+    duration: "2 Hours",
+    price: 750,
+    priceNote: "per guest",
+    highlights: ["Hand-spin coconut husk coir fiber", "Watch Aranmula secret alloy casting", "Take home handwoven mat"],
+    host: {
+      name: "Soman Pillai",
+      role: "Coir Artisan Collective Leader",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+      rating: 4.91
+    },
+    image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+    badge: "Eco Craft Guild",
+    shortDescription: "Discover how coastal villagers transform raw coconut husks into golden fiber ropes, rugs, and traditional river craft."
+  },
+
+  // --- HIMACHAL PRADESH EXPERIENCES ---
+  {
+    id: "exp-hp-siddu",
+    title: "Himachali Siddu & Mountain Hearth Masterclass",
+    category: "Local Food",
+    state: "Himachal Pradesh",
+    stateId: "himachal-pradesh",
+    location: "Naggar Village Homestead, Kullu, Himachal Pradesh",
+    rating: 4.95,
+    reviewsCount: 112,
+    duration: "3 Hours",
+    price: 850,
+    priceNote: "per guest",
+    highlights: ["Knead and ferment yeast dough", "Traditional walnut & poppy seed stuffing", "Mountain desi ghee pairing"],
+    host: {
+      name: "Kamla Devi Thakur",
+      role: "Pahadi Heritage Homemaker",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+      rating: 4.99
+    },
+    image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+    badge: "Village Kitchen",
+    shortDescription: "Sit around a wood-fired hearth in a cedar wood home and master the steaming of authentic Himachali Siddu served with hot desi ghee."
+  },
+  {
+    id: "exp-hp-nati",
+    title: "Kullu Nati Folk Dance & Highland Music Circle",
+    category: "Folk Dance & Music",
+    state: "Himachal Pradesh",
+    stateId: "himachal-pradesh",
+    location: "Old Manali Meadow, Himachal Pradesh",
+    rating: 4.91,
+    reviewsCount: 96,
+    duration: "2 Hours",
+    price: 900,
+    priceNote: "per guest",
+    highlights: ["Wear embroidered Kullu topi and pattu", "Learn step-sync circular Nati steps", "Resonant Karnal horn melodies"],
+    host: {
+      name: "Surender Negi & Troupe",
+      role: "Kullu Folk Troupe Custodian",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      rating: 4.94
+    },
+    image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80",
+    badge: "Community Circle",
+    shortDescription: "Join village elders and youths in the rhythmic Nati dance circle under tall pine trees, accompanied by traditional drums and brass flutes."
+  },
+  {
+    id: "exp-hp-weaving",
+    title: "Handloom Kullu Shawl Weaving & Tibetan Thangka Workshop",
+    category: "Handicrafts & Workshops",
+    state: "Himachal Pradesh",
+    stateId: "himachal-pradesh",
+    location: "Kullu Valley Weavers Cooperative, Himachal Pradesh",
+    rating: 4.89,
+    reviewsCount: 74,
+    duration: "2.5 Hours",
+    price: 1150,
+    priceNote: "per guest",
+    highlights: ["Pit loom shuttle practice", "Geometric dovetail border patterns", "Mineral pigment grinding demo"],
+    host: {
+      name: "Tsering Dorje",
+      role: "Master Handloom Weaver",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+      rating: 4.92
+    },
+    image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
+    badge: "Artisan Co-op",
+    shortDescription: "Weave colorful geometric borders onto fine merino wool on hand-operated wooden pit looms guided by state-award-winning artisans."
+  },
+
+  // --- GOA EXPERIENCES ---
+  {
+    id: "exp-goa-food",
+    title: "Ancestral Goan Saraswat Feast & Earthen Poi Baking",
+    category: "Local Food",
+    state: "Goa",
+    stateId: "goa",
+    location: "Fontainhas Latin Quarter, Panaji, Goa",
+    rating: 4.94,
+    reviewsCount: 128,
+    duration: "3 Hours",
+    price: 1100,
+    priceNote: "per guest",
+    highlights: ["Wood-fired earthen oven baking", "Fresh coconut and kokum curry", "Layered Bebinca tasting"],
+    host: {
+      name: "Chef Maria & Anand Fernandes",
+      role: "Heritage Recipe Custodians",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+      rating: 4.97
+    },
+    image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+    badge: "Heritage Kitchen",
+    shortDescription: "Cook inside a 180-year-old Portuguese mansion kitchen and discover the delicate balance of Goan kokum, coconut vinegar, and fresh catch."
+  },
+  {
+    id: "exp-goa-tiles",
+    title: "Hand-Painted Azulejo Ceramic Tile Masterclass",
+    category: "Handicrafts & Workshops",
+    state: "Goa",
+    stateId: "goa",
+    location: "Rua 31 de Janeiro, Fontainhas, Goa",
+    rating: 4.92,
+    reviewsCount: 92,
+    duration: "2 Hours",
+    price: 950,
+    priceNote: "per guest",
+    highlights: ["Hand-paint cobalt blue tiles", "Stenciling traditional motifs", "Fired tile shipped to your address"],
+    host: {
+      name: "Orlando de Souza",
+      role: "Azulejo Master Ceramicist",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      rating: 4.95
+    },
+    image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+    badge: "Latin Atelier",
+    shortDescription: "Paint your own bespoke glazed Azulejo tile using centuries-old Portuguese cobalt oxide mineral techniques."
+  },
+  {
+    id: "exp-goa-music",
+    title: "Fontainhas Twilight Heritage Walk & Fado Melodies",
+    category: "Folk Dance & Music",
+    state: "Goa",
+    stateId: "goa",
+    location: "Panaji Latin Quarter, Goa",
+    rating: 4.97,
+    reviewsCount: 165,
+    duration: "2.5 Hours",
+    price: 1200,
+    priceNote: "per guest",
+    highlights: ["Cobblestone Latin Quarter walking trail", "Intimate Fado acoustic singing", "Local cashew feni pairing"],
+    host: {
+      name: "Savio Alvares",
+      role: "Goan Heritage Chronicler",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+      rating: 4.98
+    },
+    image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
+    badge: "Twilight Walk",
+    shortDescription: "Stroll along pastel-hued alleys lined with oyster-shell windows, concluding in a private courtyard with live Portuguese and Goan Fado guitars."
+  },
+
   // --- RAJASTHAN EXPERIENCES ---
   {
     id: "exp-raj-folk-dance",

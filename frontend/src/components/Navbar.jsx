@@ -85,8 +85,8 @@ export default function Navbar({
 
   // Navigation Items defined in strict order requested
   const primaryNavItems = [
-    { id: 'home', label: 'Home', icon: Home, action: () => handleNavClick('experiences') },
-    { id: 'explore', label: 'Explore', icon: Globe, action: () => handleNavClick('experiences') },
+    { id: 'home', label: 'Home', icon: Home, action: () => handleNavClick('home') },
+    { id: 'explore', label: 'Explore', icon: Globe, action: () => handleNavClick('explore') },
     { id: 'experiences', label: 'Experiences', icon: Sparkles, action: () => handleNavClick('experiences') },
     { id: 'place-details', label: 'Place Details', icon: MapPin, action: () => handleNavClick('place-details') },
     { id: 'planner', label: 'AI Trip Planner', icon: Calendar, action: () => handleNavClick('planner') },
@@ -133,7 +133,7 @@ export default function Navbar({
               const isActive =
                 activeTab === item.id ||
                 (item.id === 'home' && activeTab === 'experiences') ||
-                (item.id === 'explore' && activeTab === 'state-details');
+                (item.id === 'explore' && (activeTab === 'explore' || activeTab === 'state-details'));
 
               if (item.isPrimaryAction) {
                 return (
@@ -350,7 +350,10 @@ export default function Navbar({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {primaryNavItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeTab === item.id;
+                const isActive =
+                  activeTab === item.id ||
+                  (item.id === 'home' && activeTab === 'experiences') ||
+                  (item.id === 'explore' && (activeTab === 'explore' || activeTab === 'state-details'));
 
                 return (
                   <button

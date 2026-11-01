@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ExperiencesPage from './pages/ExperiencesPage';
+import ExplorePage from './pages/ExplorePage';
 import PlaceDetailsPage from './pages/PlaceDetailsPage';
 import ContributionFormPage from './pages/ContributionFormPage';
 import ProfilePage from './pages/ProfilePage';
@@ -103,25 +104,22 @@ export default function App() {
   };
 
   const navigateToExplore = () => {
-    setActiveTab('experiences');
-    window.history.pushState({ tab: 'experiences' }, '', '/');
+    setActiveTab('explore');
+    window.history.pushState({ tab: 'explore' }, '', '/explore');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleTabChange = (tab) => {
     let targetTab = tab;
-    if (tab === 'home' || tab === 'explore') targetTab = 'experiences';
+    if (tab === 'home') targetTab = 'experiences';
+    if (tab === 'explore') targetTab = 'explore';
     if (tab === 'route-budget') targetTab = 'route_budget';
 
     setActiveTab(targetTab);
     if (targetTab === 'experiences') {
       window.history.pushState({ tab: 'experiences' }, '', '/');
-      if (tab === 'explore') {
-        setTimeout(() => {
-          const el = document.getElementById('explore-states-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }, 150);
-      }
+    } else if (targetTab === 'explore') {
+      window.history.pushState({ tab: 'explore' }, '', '/explore');
     } else if (targetTab === 'place-details') {
       window.history.pushState({ tab: 'place-details' }, '', '/place-details');
     } else if (targetTab === 'contribute') {
@@ -137,22 +135,34 @@ export default function App() {
     } else if (targetTab === 'route_budget') {
       window.history.pushState({ tab: 'route_budget' }, '', '/route-budget');
     }
-    if (tab !== 'explore') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Browser route synchronization on load and on popstate (browser back/forward)
   useEffect(() => {
     const syncRouteFromUrl = () => {
       const path = window.location.pathname.toLowerCase();
-      const validStates = ['rajasthan', 'gujarat', 'west-bengal', 'assam'];
+      const validStates = [
+        'rajasthan',
+        'gujarat',
+        'west-bengal',
+        'assam',
+        'kerala',
+        'himachal-pradesh',
+        'madhya-pradesh',
+        'goa'
+      ];
 
       // Match /explore/:stateId
       const exploreMatch = path.match(/^\/explore\/([a-z-]+)\/?$/);
       if (exploreMatch && validStates.includes(exploreMatch[1])) {
         setSelectedStateId(exploreMatch[1]);
         setActiveTab('state-details');
+        return;
+      }
+
+      if (path === '/explore' || path === '/explore/') {
+        setActiveTab('explore');
         return;
       }
 
@@ -194,7 +204,7 @@ export default function App() {
 
       {/* Main Navbar */}
       <Navbar
-        activeTab={activeTab === 'state-details' ? 'experiences' : activeTab}
+        activeTab={activeTab === 'state-details' ? 'explore' : activeTab}
         setActiveTab={handleTabChange}
         tripItems={tripItems}
         favoritesCount={favorites.length}
@@ -219,6 +229,21 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
+          />
+        )}
+        {activeTab === 'explore' && (
+          <ExplorePage
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            tripItems={tripItems}
+            onToggleTrip={handleToggleTrip}
+            onNavigateToPlace={(destId) => {
+              if (destId) setSelectedDestinationId(destId);
+              setActiveTab('place-details');
+              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
+            }}
+            onNavigateToState={navigateToState}
+            onNavigate={handleTabChange}
           />
         )}
         {activeTab === 'experiences' && (
