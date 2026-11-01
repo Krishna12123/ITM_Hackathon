@@ -104,7 +104,7 @@ export default function Navbar({
           {/* =============================================================== */}
           <div
             className="flex items-center gap-2.5 sm:gap-3 cursor-pointer shrink-0 group select-none"
-            onClick={() => handleNavClick('experiences')}
+            onClick={() => handleNavClick('home')}
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#F36B21] group-hover:bg-[#D94E0B] flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 active:scale-95">
               <Compass className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] animate-profile-enter" />
@@ -132,8 +132,7 @@ export default function Navbar({
               const Icon = item.icon;
               const isActive =
                 activeTab === item.id ||
-                (item.id === 'home' && activeTab === 'experiences') ||
-                (item.id === 'explore' && (activeTab === 'explore' || activeTab === 'state-details'));
+                (item.id === 'explore' && activeTab === 'state-details');
 
               if (item.isPrimaryAction) {
                 return (
@@ -173,7 +172,9 @@ export default function Navbar({
           <nav className="hidden lg:flex xl:hidden items-center gap-1 text-xs font-semibold">
             {primaryNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive =
+                activeTab === item.id ||
+                (item.id === 'explore' && activeTab === 'state-details');
               return (
                 <button
                   key={item.id}
@@ -352,8 +353,7 @@ export default function Navbar({
                 const Icon = item.icon;
                 const isActive =
                   activeTab === item.id ||
-                  (item.id === 'home' && activeTab === 'experiences') ||
-                  (item.id === 'explore' && (activeTab === 'explore' || activeTab === 'state-details'));
+                  (item.id === 'explore' && activeTab === 'state-details');
 
                 return (
                   <button

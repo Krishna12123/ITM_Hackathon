@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
 import ExperiencesPage from './pages/ExperiencesPage';
 import ExplorePage from './pages/ExplorePage';
 import PlaceDetailsPage from './pages/PlaceDetailsPage';
@@ -15,7 +16,7 @@ import Footer from './components/Footer';
 import { Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('experiences');
+  const [activeTab, setActiveTab] = useState('home');
   const [selectedDestinationId, setSelectedDestinationId] = useState('amber-fort');
   const [selectedStateId, setSelectedStateId] = useState('rajasthan');
 
@@ -100,26 +101,38 @@ export default function App() {
     setSelectedStateId(stateId);
     setActiveTab('state-details');
     window.history.pushState({ tab: 'state-details', stateId }, '', `/explore/${stateId}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToPlace = (destId) => {
+    if (destId) setSelectedDestinationId(destId);
+    setActiveTab('place-details');
+    window.history.pushState({ tab: 'place-details', destId }, '', '/place-details');
   };
 
   const navigateToExplore = () => {
     setActiveTab('explore');
     window.history.pushState({ tab: 'explore' }, '', '/explore');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToHome = () => {
+    setActiveTab('home');
+    window.history.pushState({ tab: 'home' }, '', '/');
   };
 
   const handleTabChange = (tab) => {
     let targetTab = tab;
-    if (tab === 'home') targetTab = 'experiences';
+    if (tab === 'home') targetTab = 'home';
     if (tab === 'explore') targetTab = 'explore';
+    if (tab === 'experiences') targetTab = 'experiences';
     if (tab === 'route-budget') targetTab = 'route_budget';
 
     setActiveTab(targetTab);
-    if (targetTab === 'experiences') {
-      window.history.pushState({ tab: 'experiences' }, '', '/');
+    if (targetTab === 'home') {
+      window.history.pushState({ tab: 'home' }, '', '/');
     } else if (targetTab === 'explore') {
       window.history.pushState({ tab: 'explore' }, '', '/explore');
+    } else if (targetTab === 'experiences') {
+      window.history.pushState({ tab: 'experiences' }, '', '/experiences');
     } else if (targetTab === 'place-details') {
       window.history.pushState({ tab: 'place-details' }, '', '/place-details');
     } else if (targetTab === 'contribute') {
@@ -135,8 +148,18 @@ export default function App() {
     } else if (targetTab === 'route_budget') {
       window.history.pushState({ tab: 'route_budget' }, '', '/route-budget');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Global Scroll Restoration: Reset to top on any page, route, or target change
+  useEffect(() => {
+    if (!window.location.hash) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant'
+      });
+    }
+  }, [activeTab, selectedStateId, selectedDestinationId]);
 
   // Browser route synchronization on load and on popstate (browser back/forward)
   useEffect(() => {
@@ -161,8 +184,18 @@ export default function App() {
         return;
       }
 
+      if (path === '/' || path === '') {
+        setActiveTab('home');
+        return;
+      }
+
       if (path === '/explore' || path === '/explore/') {
         setActiveTab('explore');
+        return;
+      }
+
+      if (path.startsWith('/experiences')) {
+        setActiveTab('experiences');
         return;
       }
 
@@ -181,7 +214,7 @@ export default function App() {
       } else if (path.startsWith('/profile')) {
         setActiveTab('profile');
       } else {
-        setActiveTab('experiences');
+        setActiveTab('home');
       }
     };
 
@@ -213,15 +246,18 @@ export default function App() {
 
       {/* Dynamic View rendering assigned modules */}
       <main className="flex-1 w-full">
+        {activeTab === 'home' && (
+          <HomePage
+            onNavigateToState={navigateToState}
+            onNavigateToPlace={navigateToPlace}
+            onNavigate={handleTabChange}
+          />
+        )}
         {activeTab === 'state-details' && (
           <StateDestinationPage
             stateId={selectedStateId}
             onBackToExplore={navigateToExplore}
-            onNavigateToPlace={(destId) => {
-              if (destId) setSelectedDestinationId(destId);
-              setActiveTab('place-details');
-              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
-            }}
+            onNavigateToPlace={navigateToPlace}
             onSelectOtherState={(stId) => {
               navigateToState(stId);
             }}
@@ -237,11 +273,7 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
-            onNavigateToPlace={(destId) => {
-              if (destId) setSelectedDestinationId(destId);
-              setActiveTab('place-details');
-              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
-            }}
+            onNavigateToPlace={navigateToPlace}
             onNavigateToState={navigateToState}
             onNavigate={handleTabChange}
           />
@@ -252,11 +284,7 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
-            onNavigateToPlace={(destId) => {
-              if (destId) setSelectedDestinationId(destId);
-              setActiveTab('place-details');
-              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
-            }}
+            onNavigateToPlace={navigateToPlace}
             onNavigateToState={navigateToState}
             onNavigate={handleTabChange}
           />
@@ -284,10 +312,7 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             tripItems={tripItems}
             onToggleTrip={handleToggleTrip}
-            onNavigateToPlace={() => {
-              setActiveTab('place-details');
-              window.history.pushState({ tab: 'place-details' }, '', '/place-details');
-            }}
+            onNavigateToPlace={navigateToPlace}
             onNavigateToExperiences={navigateToExplore}
             onShowToast={showToast}
           />
